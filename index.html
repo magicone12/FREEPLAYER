@@ -1,93 +1,102 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>MP4 & MPD Player</title>
-  <style>
-    body {
-      background: #111;
-      color: #fff;
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding-top: 20px;
-    }
-    video {
-      width: 80%;
-      max-width: 900px;
-      border: 3px solid #444;
-    }
-    select {
-      margin-top: 15px;
-      padding: 6px 10px;
-      font-size: 16px;
-    }
-  </style>
-  <!-- Shaka Player -->
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
+<meta charset="UTF-8">
+<title>MP4 + MPD (ClearKey) Player</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
+
+<style>
+body{
+  background:#111;
+  color:#fff;
+  font-family:Arial, sans-serif;
+  text-align:center;
+  padding:20px;
+}
+video{
+  width:90%;
+  max-width:900px;
+  background:black;
+}
+select{
+  margin-top:15px;
+  padding:6px 10px;
+  font-size:16px;
+}
+</style>
 </head>
 <body>
 
-  <h1>MP4 + DASH (MPD) Player</h1>
+<h2>MP4 + MPD Player (with ClearKey)</h2>
 
-  <video id="video" controls></video>
-  <br>
+<video id="video" controls></video>
+<br>
 
-  <select id="sourceSelect">
-    <option value="mp4">Play MP4</option>
-    <option value="mpd">Play DASH (.mpd)</option>
-  </select>
+<select id="source">
+  <option value="mpd">Play MPD (ClearKey)</option>
+  <option value="mp4">Play MP4</option>
+</select>
 
-  <script>
-    document.addEventListener('DOMContentLoaded', () => {
+<script>
+document.addEventListener('DOMContentLoaded', async () => {
 
-      const video = document.getElementById('video');
-      const select = document.getElementById('sourceSelect');
+  const video = document.getElementById('video');
+  const select = document.getElementById('source');
 
-      // URLs
-      const urls = {
-        mp4: "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4",
-        mpd: "https://qp-pldt-live-bpk-01-prod.akamaized.net/bpk-tv/cg_animax_sd_new/default/index.mpd"
-      };
+  const mpdUrl = "https://qp-pldt-live-bpk-01-prod.akamaized.net/bpk-tv/cg_animax_sd_new/default/index.mpd";
+  const mp4Url = "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4";
 
-      // Initialize Shaka
-      shaka.polyfill.installAll();
+  shaka.polyfill.installAll();
 
-      if (shaka.Player.isBrowserSupported()) {
-        const player = new shaka.Player(video);
+  if (!shaka.Player.isBrowserSupported()) {
+    alert("Browser not supported");
+    return;
+  }
 
-        player.addEventListener('error', (e) => {
-          console.error("Shaka Error:", e.detail);
-        });
+  const player = new shaka.Player(video);
 
-        function loadSource(type) {
-          if (type === 'mp4') {
-            // Normal MP4
-            video.src = urls.mp4;
-            video.play();
-          } else {
-            // DASH
-            player.load(urls.mpd).then(() => {
-              console.log('DASH Loaded successfully');
-            }).catch((err) => {
-              console.error('Failed to load DASH:', err);
-            });
-          }
-        }
+  player.addEventListener('error', e => {
+    console.error("Shaka error", e.detail);
+  });
 
-        // initial load
-        loadSource(select.value);
-
-        // change event
-        select.addEventListener('change', () => {
-          video.pause();
-          loadSource(select.value);
-        });
-
-      } else {
-        alert("Sorry, your browser does not support Shaka Player.");
+  // 👉 ClearKey configuration
+  player.configure({
+    drm: {
+      clearKeys: {
+        // KID : KEY
+        "1e7b9d2c6a4f4d8c9f33b5c1a8d7e260":
+        "67336c0c5b24fb4b8caac248dad3c55d"
       }
-    });
-  </script>
+    }
+  });
+
+  async function load(type){
+    try{
+      video.pause();
+      await player.unload();
+
+      if(type === "mp4"){
+        video.src = mp4Url;
+        await video.play();
+      }else{
+        await player.load(mpdUrl);
+        await video.play();
+      }
+    }catch(e){
+      console.error("Load error:", e);
+    }
+  }
+
+  select.addEventListener('change', () => {
+    load(select.value);
+  });
+
+  // auto load MPD first
+  load("mpd");
+
+});
+</script>
 
 </body>
 </html>
