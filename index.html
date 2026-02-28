@@ -1,121 +1,93 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>Shaka Player Demo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            background-color: #121212;
-            color: #fff;
-            text-align: center;
-            margin: 0;
-            padding: 20px;
-        }
-
-        #playerContainer {
-            margin-bottom: 20px;
-        }
-
-        video {
-            width: 80%;
-            max-width: 800px;
-            height: auto;
-            border: 2px solid #444;
-            border-radius: 8px;
-            background-color: #000;
-        }
-
-        .channelBtn {
-            display: inline-block;
-            width: 180px;
-            margin: 10px;
-            cursor: pointer;
-            border: 2px solid #444;
-            border-radius: 8px;
-            overflow: hidden;
-            transition: 0.3s;
-            vertical-align: top;
-        }
-
-        .channelBtn:hover {
-            border-color: #fff;
-        }
-
-        .channelBtn img {
-            width: 100%;
-            height: auto;
-        }
-
-        .channelCode {
-            padding: 8px;
-            background-color: #222;
-            font-weight: bold;
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>MP4 & MPD Player</title>
+  <style>
+    body {
+      background: #111;
+      color: #fff;
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding-top: 20px;
+    }
+    video {
+      width: 80%;
+      max-width: 900px;
+      border: 3px solid #444;
+    }
+    select {
+      margin-top: 15px;
+      padding: 6px 10px;
+      font-size: 16px;
+    }
+  </style>
+  <!-- Shaka Player -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
 </head>
 <body>
 
-<h1>Shaka Player Demo</h1>
+  <h1>MP4 + DASH (MPD) Player</h1>
 
-<div id="playerContainer">
-    <video id="videoPlayer" controls poster="" autoplay></video>
-</div>
+  <video id="video" controls></video>
+  <br>
 
-<!-- Video Thumbnails -->
-<div class="channelBtn" data-manifest="https://storage.googleapis.com/shaka-demo-assets/angel-one/dash.mpd" data-type="DASH" data-poster="https://storage.googleapis.com/shaka-demo-assets/angel-one.jpg">
-    <img src="https://storage.googleapis.com/shaka-demo-assets/angel-one.jpg" alt="Angel One">
-    <div class="channelCode">Angel One (DASH)</div>
-</div>
+  <select id="sourceSelect">
+    <option value="mp4">Play MP4</option>
+    <option value="mpd">Play DASH (.mpd)</option>
+  </select>
 
-<div class="channelBtn" data-manifest="https://storage.googleapis.com/shaka-demo-assets/ForBiggerJoyrides.mp4" data-type="MP4" data-poster="https://storage.googleapis.com/shaka-demo-assets/ForBiggerJoyrides.jpg">
-    <img src="https://storage.googleapis.com/shaka-demo-assets/ForBiggerJoyrides.jpg" alt="For Bigger Joyrides">
-    <div class="channelCode">For Bigger Joyrides (MP4)</div>
-</div>
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
 
-<!-- Shaka Player library -->
-<script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.5/shaka-player.compiled.js"></script>
+      const video = document.getElementById('video');
+      const select = document.getElementById('sourceSelect');
 
-<script>
-document.addEventListener('DOMContentLoaded', function () {
-    const video = document.getElementById('videoPlayer');
-    const buttons = document.querySelectorAll('.channelBtn');
+      // URLs
+      const urls = {
+        mp4: "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4",
+        mpd: "https://qp-pldt-live-bpk-01-prod.akamaized.net/bpk-tv/cg_animax_sd_new/default/index.mpd"
+      };
 
-    // Initialize Shaka Player
-    const player = new shaka.Player(video);
+      // Initialize Shaka
+      shaka.polyfill.installAll();
 
-    // Listen for errors
-    player.addEventListener('error', function(event) {
-        console.error('Shaka Player Error:', event.detail);
-        alert('Error playing video. Check console for details.');
-    });
+      if (shaka.Player.isBrowserSupported()) {
+        const player = new shaka.Player(video);
 
-    buttons.forEach(btn => {
-        btn.addEventListener('click', () => {
-            const manifest = btn.getAttribute('data-manifest');
-            const type = btn.getAttribute('data-type');
-            const poster = btn.getAttribute('data-poster') || '';
-
-            video.poster = poster;
-
-            if(type === "MP4") {
-                // Direktang MP4
-                video.src = manifest;
-                video.load();
-                video.play();
-            } else if(type === "DASH") {
-                // DASH gamit Shaka Player
-                player.load(manifest).then(() => {
-                    video.play();
-                }).catch(err => {
-                    console.error(err);
-                    alert('Failed to load DASH video');
-                });
-            }
+        player.addEventListener('error', (e) => {
+          console.error("Shaka Error:", e.detail);
         });
+
+        function loadSource(type) {
+          if (type === 'mp4') {
+            // Normal MP4
+            video.src = urls.mp4;
+            video.play();
+          } else {
+            // DASH
+            player.load(urls.mpd).then(() => {
+              console.log('DASH Loaded successfully');
+            }).catch((err) => {
+              console.error('Failed to load DASH:', err);
+            });
+          }
+        }
+
+        // initial load
+        loadSource(select.value);
+
+        // change event
+        select.addEventListener('change', () => {
+          video.pause();
+          loadSource(select.value);
+        });
+
+      } else {
+        alert("Sorry, your browser does not support Shaka Player.");
+      }
     });
-});
-</script>
+  </script>
 
 </body>
 </html>
