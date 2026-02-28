@@ -2,98 +2,210 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>MP4 + MPD (ClearKey) Player</title>
+<title>IPTV Player (MPD + M3U8 + MP4)</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <style>
 body{
+  margin:0;
   background:#111;
   color:#fff;
   font-family:Arial, sans-serif;
+}
+.playerWrap{
+  padding:10px;
   text-align:center;
-  padding:20px;
 }
 video{
-  width:90%;
+  width:95%;
   max-width:900px;
   background:black;
 }
-select{
-  margin-top:15px;
-  padding:6px 10px;
-  font-size:16px;
+.channels{
+  display:flex;
+  flex-wrap:wrap;
+  gap:10px;
+  padding:10px;
+  justify-content:center;
+}
+.channelBtn{
+  width:140px;
+  cursor:pointer;
+  background:#222;
+  border-radius:6px;
+  overflow:hidden;
+  text-align:center;
+}
+.channelBtn img{
+  width:100%;
+  display:block;
+}
+.channelCode{
+  padding:6px;
+  font-size:14px;
 }
 </style>
 </head>
 <body>
 
-<h2>MP4 + MPD Player (with ClearKey)</h2>
+<div class="playerWrap">
+  <video id="video" controls></video>
+</div>
 
-<video id="video" controls></video>
-<br>
+<div class="channels">
 
-<select id="source">
-  <option value="mpd">Play MPD (ClearKey)</option>
-  <option value="mp4">Play MP4</option>
-</select>
+  <!-- MP4 -->
+  <div class="channelBtn"
+       data-manifest="https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4"
+       data-type="MP4"
+       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
+    <img src="https://i.imgur.com/4NJlK0A.png">
+    <div class="channelCode">MP4 SAMPLE</div>
+  </div>
+
+  <!-- CINEMO -->
+  <div class="channelBtn"
+       data-manifest="https://saanmaateocable-cinemo.ostamark484.workers.dev/"
+       data-type="IPTV"
+       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
+    <img src="https://i.imgur.com/2Jn7QHG.png">
+    <div class="channelCode">CINEMO!</div>
+  </div>
+
+  <!-- LOTUS MACAU -->
+  <div class="channelBtn"
+       data-manifest="https://wandering-scene-0db6.ostamark484.workers.dev/stream.m3u8"
+       data-type="IPTV"
+       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
+    <img src="https://i.imgur.com/KIkQd8q.png">
+    <div class="channelCode">LOTUS MACAU</div>
+  </div>
+
+  <!-- CINEMAX -->
+  <div class="channelBtn"
+       data-manifest="https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/cg_cinemax/default/index.mpd"
+       data-key="b207c44332844523a3a3b0469e5652d7:fe71aea346db08f8c6fbf0592209f955"
+       data-type="IPTV"
+       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
+    <img src="https://i.imgur.com/r8qzNiy.png">
+    <div class="channelCode">CINEMAX</div>
+  </div>
+
+  <!-- HBO -->
+  <div class="channelBtn"
+       data-manifest="https://qp-pldt-live-bpk-02-prod.akamaized.net/bpk-tv/cg_hbohd/default/index.mpd"
+       data-key="c2b7a1e95d4f4c3a8e617f9d0a2b6c18:27fca1ab042998b0c2f058b0764d7ed4"
+       data-type="IPTV"
+       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
+    <img src="https://i.imgur.com/fHBIgs6.png">
+    <div class="channelCode">HBO</div>
+  </div>
+
+</div>
 
 <script>
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener("DOMContentLoaded", () => {
 
-  const video = document.getElementById('video');
-  const select = document.getElementById('source');
-
-  const mpdUrl = "https://qp-pldt-live-bpk-01-prod.akamaized.net/bpk-tv/cg_animax_sd_new/default/index.mpd";
-  const mp4Url = "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4";
+  const video = document.getElementById("video");
 
   shaka.polyfill.installAll();
 
-  if (!shaka.Player.isBrowserSupported()) {
-    alert("Browser not supported");
-    return;
+  let shakaPlayer = null;
+  let hls = null;
+
+  async function destroyPlayers(){
+    if(hls){
+      hls.destroy();
+      hls = null;
+    }
+    if(shakaPlayer){
+      await shakaPlayer.destroy();
+      shakaPlayer = null;
+    }
+    video.removeAttribute("src");
+    video.load();
   }
 
-  const player = new shaka.Player(video);
+  async function playMP4(url){
+    await destroyPlayers();
+    video.src = url;
+    await video.play();
+  }
 
-  player.addEventListener('error', e => {
-    console.error("Shaka error", e.detail);
-  });
+  async function playMPD(url, keyString){
 
-  // 👉 ClearKey configuration
-  player.configure({
-    drm: {
-      clearKeys: {
-        // KID : KEY
-        "1e7b9d2c6a4f4d8c9f33b5c1a8d7e260":
-        "67336c0c5b24fb4b8caac248dad3c55d"
+    await destroyPlayers();
+
+    shakaPlayer = new shaka.Player(video);
+
+    if(keyString){
+      const p = keyString.split(":");
+      if(p.length === 2){
+        shakaPlayer.configure({
+          drm:{
+            clearKeys:{
+              [p[0].trim()] : p[1].trim()
+            }
+          }
+        });
       }
     }
-  });
 
-  async function load(type){
-    try{
-      video.pause();
-      await player.unload();
+    await shakaPlayer.load(url);
+    await video.play();
+  }
 
-      if(type === "mp4"){
-        video.src = mp4Url;
-        await video.play();
+  async function playM3U8(url){
+
+    await destroyPlayers();
+
+    if(video.canPlayType("application/vnd.apple.mpegurl")){
+      video.src = url;
+      await video.play();
+    }else if(window.Hls && Hls.isSupported()){
+      hls = new Hls();
+      hls.loadSource(url);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, function(){
+        video.play();
+      });
+    }else{
+      alert("HLS not supported");
+    }
+  }
+
+  document.querySelectorAll(".channelBtn").forEach(btn => {
+
+    btn.addEventListener("click", () => {
+
+      const url  = btn.dataset.manifest;
+      const key  = btn.dataset.key || "";
+      const post = btn.dataset.poster || "";
+
+      if(post) video.poster = post;
+
+      if(url.endsWith(".mp4")){
+        playMP4(url);
+      }else if(url.endsWith(".mpd")){
+        playMPD(url, key);
+      }else if(url.endsWith(".m3u8")){
+        playM3U8(url);
       }else{
-        await player.load(mpdUrl);
-        await video.play();
+        // fallback
+        if(url.includes(".mpd")){
+          playMPD(url, key);
+        }else if(url.includes(".m3u8")){
+          playM3U8(url);
+        }else{
+          playMP4(url);
+        }
       }
-    }catch(e){
-      console.error("Load error:", e);
-    }
-  }
 
-  select.addEventListener('change', () => {
-    load(select.value);
+    });
+
   });
-
-  // auto load MPD first
-  load("mpd");
 
 });
 </script>
