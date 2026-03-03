@@ -51,7 +51,7 @@ video{
 <body>
 
 <div class="playerWrap">
-  <video id="video" controls></video>
+ <video id="video" controls preload="auto" playsinline></video>
 </div>
 
 <div class="channels">
@@ -146,7 +146,18 @@ document.addEventListener("DOMContentLoaded", () => {
       video.src = url;
       await video.play();
     }else if(window.Hls && Hls.isSupported()){
-      hls = new Hls();
+     hls = new Hls({
+  enableWorker: true,
+  lowLatencyMode: false,
+
+  maxBufferLength: 30,
+  maxMaxBufferLength: 60,
+  backBufferLength: 30,
+
+  fragLoadingTimeOut: 20000,
+  manifestLoadingTimeOut: 20000,
+  levelLoadingTimeOut: 20000
+});
       hls.loadSource(url);
       hls.attachMedia(video);
       hls.on(Hls.Events.MANIFEST_PARSED, function(){
@@ -211,6 +222,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
