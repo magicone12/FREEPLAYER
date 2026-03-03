@@ -90,6 +90,8 @@ video{
 document.addEventListener("DOMContentLoaded", () => {
 
   const video = document.getElementById("video");
+  const buttons = Array.from(document.querySelectorAll(".channelBtn"));
+let currentIndex = -1;
 
   shaka.polyfill.installAll();
 
@@ -156,9 +158,53 @@ document.addEventListener("DOMContentLoaded", () => {
       alert("HLS not supported");
     }
   }
+  async function playByIndex(index){
 
-  document.querySelectorAll(".channelBtn").forEach(btn => {
+  if(index < 0 || index >= buttons.length) return;
 
+  currentIndex = index;
+
+  const btn = buttons[index];
+
+  const url  = btn.dataset.manifest;
+  const key  = btn.dataset.key || "";
+  const post = btn.dataset.poster || "";
+
+  if(post) video.poster = post;
+
+  if(url.endsWith(".mp4")){
+    playMP4(url);
+  }else if(url.endsWith(".mpd")){
+    playMPD(url, key);
+  }else if(url.endsWith(".m3u8")){
+    playM3U8(url);
+  }else{
+    if(url.includes(".mpd")){
+      playMPD(url, key);
+    }else if(url.includes(".m3u8")){
+      playM3U8(url);
+    }else{
+      playMP4(url);
+    }
+  }
+}
+
+buttons.forEach((btn, index) => {
+
+  btn.addEventListener("click", () => {
+    playByIndex(index);
+  });
+
+});
+  video.addEventListener("ended", () => {
+
+  const nextIndex = currentIndex + 1;
+
+  if(nextIndex < buttons.length){
+    playByIndex(nextIndex);
+  }
+
+});
     btn.addEventListener("click", () => {
 
       const url  = btn.dataset.manifest;
@@ -193,5 +239,6 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
