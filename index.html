@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>IPTV Fullscreen Autoplay</title>
+<title>IPTV Fullscreen 16:9 Autoplay</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
 
@@ -11,38 +11,27 @@ html, body{
   margin:0;
   padding:0;
   height:100%;
+  width:100%;
   background:black;
   overflow:hidden;
 }
-.videoContainer{
-  position: relative;
-  width:100%;
-  height:100%;
-  padding-top: 56.25%; /* 16:9 */
-}
 video{
-  position:absolute;
-  top:0;
-  left:0;
   width:100%;
   height:100%;
-  object-fit: fill; /* stretch video to fill 16:9 */
+  object-fit: fill; /* stretch to fill screen */
   background:black;
 }
 </style>
 </head>
 <body>
 
-<div class="videoContainer">
-  <video id="video" autoplay muted playsinline></video>
-</div>
+<video id="video" autoplay muted playsinline></video>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
   const video = document.getElementById("video");
 
-  // Playlist MP4 + MPD
   const playlist = [
     {
       type: "MP4",
@@ -99,14 +88,16 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Loop to next video
   video.addEventListener("ended", () => {
     currentIndex = (currentIndex + 1) % playlist.length;
     playCurrent();
   });
 
-  // Start first video automatically
+  // Start first video
   playCurrent();
+
+  // Optional: fullscreen automatically
+  video.requestFullscreen?.();
 
 });
 </script>
