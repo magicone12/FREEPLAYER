@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>IPTV Player Auto-Loop MP4+MPD</title>
+<title>IPTV Player Auto-Loop MP4+MPD 16:9</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
 
@@ -15,11 +15,23 @@ body{
 }
 .playerWrap{
   padding:10px;
-  text-align:center;
+  display:flex;
+  justify-content:center;
 }
-video{
+.videoContainer{
   width:95%;
   max-width:900px;
+  position: relative;
+  padding-top: 56.25%; /* 16:9 aspect ratio */
+  background:black;
+}
+video{
+  position:absolute;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  object-fit:contain; /* fit video inside container */
   background:black;
 }
 .channels{
@@ -50,11 +62,14 @@ video{
 <body>
 
 <div class="playerWrap">
-<video id="video" controls preload="auto" playsinline></video>
+  <div class="videoContainer">
+    <video id="video" controls preload="auto" playsinline></video>
+  </div>
 </div>
 
 <div class="channels">
- <!-- MP4 -->
+
+   <!-- MP4 -->
   <div class="channelBtn"
        data-manifest="https://dn721906.ca.archive.org/0/items/maging-sino-ka-man-full-movie-robin-padilla-sharon-cuneta-you-tube-360p_202405/Maging_Sino_Ka_Man_Full_Movie_Robin_Padilla_%26_Sharon_Cuneta___YouTube%28360p%29.mp4"
        data-type="MP4"
@@ -103,6 +118,25 @@ https://ia802809.us.archive.org/18/items/the-journey-with-lyrics-by-lea-salonga-
     <div class="channelCode">MPD SAMPLE</div>
   </div>
 
+  <!-- MP4 -->
+  <div class="channelBtn"
+       data-manifest="https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4"
+       data-type="MP4"
+       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
+    <img src="https://i.imgur.com/4NJlK0A.png">
+    <div class="channelCode">MP4 SAMPLE</div>
+  </div>
+
+  <!-- MPD -->
+  <div class="channelBtn"
+       data-manifest="https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd"
+       data-key="f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd"
+       data-type="IPTV"
+       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
+    <img src="https://i.imgur.com/fHBIgs6.png">
+    <div class="channelCode">MPD SAMPLE</div>
+  </div>
+
 </div>
 
 <script>
@@ -125,9 +159,7 @@ document.addEventListener("DOMContentLoaded", () => {
     video.load();
   }
 
-  // =========================
   // MP4 playback
-  // =========================
   async function playMP4(url){
     await destroyPlayers();
     video.preload = "auto";
@@ -140,9 +172,7 @@ document.addEventListener("DOMContentLoaded", () => {
     await video.play();
   }
 
-  // =========================
-  // Shaka MPD playback
-  // =========================
+  // MPD playback
   async function playMPD(url, keyString){
     await destroyPlayers();
     shakaPlayer = new shaka.Player(video);
@@ -160,9 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
     await video.play();
   }
 
-  // =========================
   // PLAY BY INDEX
-  // =========================
   async function playByIndex(index){
     if(index < 0 || index >= buttons.length) return;
     currentIndex = index;
@@ -175,28 +203,22 @@ document.addEventListener("DOMContentLoaded", () => {
     if(url.endsWith(".mp4") || btn.dataset.type === "MP4"){
       playMP4(url);
     }else if(url.endsWith(".mpd") || btn.dataset.type === "IPTV"){
-      playMPD(url, key);
+      playMPD(url,key);
     }
   }
 
-  // =========================
-  // CLICK HANDLER
-  // =========================
+  // Click handler
   buttons.forEach((btn,index) => {
     btn.addEventListener("click", () => playByIndex(index));
   });
 
-  // =========================
-  // AUTO NEXT + LOOP
-  // =========================
+  // Auto next + loop
   video.addEventListener("ended", () => {
     const nextIndex = (currentIndex + 1) % buttons.length;
     playByIndex(nextIndex);
   });
 
-  // =========================
-  // START FIRST VIDEO
-  // =========================
+  // Start first video automatically
   playByIndex(0);
 
 });
@@ -204,7 +226,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
-
-
-
-
