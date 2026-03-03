@@ -21,16 +21,17 @@ video{
   object-fit: fill; /* stretch video to fill screen */
   background:black;
 }
+
+/* TITLE OVERLAY */
 #titleOverlay{
   position:absolute;
-  top:10px;
-  left:50%;
-  transform:translateX(-50%);
+  top:20px;   /* adjust vertical position */
+  left:20px;  /* adjust horizontal position */
   background: rgba(0,0,0,0.5);
   color:#fff;
   font-family: Arial, sans-serif;
-  font-size: 24px;
-  padding: 8px 16px;
+  font-size: 28px;  /* adjust font size */
+  padding: 10px 16px;  /* adjust padding around text */
   border-radius: 8px;
   z-index: 10;
 }
@@ -48,22 +49,6 @@ document.addEventListener("DOMContentLoaded", () => {
   const titleOverlay = document.getElementById("titleOverlay");
 
   const playlist = [
-     {
-      type: "MP4",
-      manifest: "https://dn721906.ca.archive.org/0/items/maging-sino-ka-man-full-movie-robin-padilla-sharon-cuneta-you-tube-360p_202405/Maging_Sino_Ka_Man_Full_Movie_Robin_Padilla_%26_Sharon_Cuneta___YouTube%28360p%29.mp4",
-     title: "DADAADADADA"
-     },
-    {
-      type: "MP4",
-      manifest: "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4",
-       title: "HGHGHGHGHGHGH"
-    },
-    {
-      type: "IPTV",
-      manifest: "https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd",
-      key: "f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd",
-       title: "KJKJKJKJKJKJK"
-    },
     {
       type: "MP4",
       manifest: "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4",
@@ -91,8 +76,8 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   function updateTitle(title){
-    document.title = title; // browser tab
-    titleOverlay.textContent = title; // on-screen
+    document.title = title; 
+    titleOverlay.textContent = title; 
   }
 
   async function playMP4(url, title){
@@ -143,10 +128,8 @@ document.addEventListener("DOMContentLoaded", () => {
     playCurrent();
   });
 
-  // Start first video
   playCurrent();
 
-  // Optional: fullscreen automatically
   video.requestFullscreen?.();
 
 });
@@ -154,4 +137,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
-
