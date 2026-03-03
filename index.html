@@ -51,7 +51,7 @@ video{
 <body>
 
 <div class="playerWrap">
- <video id="video" controls preload="auto" playsinline></video>
+<video id="video" controls preload="auto" playsinline></video>
 </div>
 
 <div class="channels">
@@ -119,11 +119,23 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   async function playMP4(url){
-    await destroyPlayers();
-    video.src = url;
-    await video.play();
-  }
 
+  await destroyPlayers();
+
+  video.preload = "auto";
+  video.src = url;
+  video.load();
+
+  await new Promise(resolve => {
+    if (video.readyState >= 3) {
+      resolve();
+    } else {
+      video.addEventListener("canplay", resolve, { once:true });
+    }
+  });
+
+  await video.play();
+}
   async function playMPD(url, keyString){
     await destroyPlayers();
 
@@ -229,6 +241,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
