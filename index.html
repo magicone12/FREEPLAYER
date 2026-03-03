@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>IPTV Fullscreen 16:9 Autoplay</title>
+<title>IPTV Fullscreen 16:9 Autoplay with Sound</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
 
@@ -25,7 +25,7 @@ video{
 </head>
 <body>
 
-<video id="video" autoplay muted playsinline></video>
+<video id="video" autoplay playsinline></video>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -61,7 +61,12 @@ document.addEventListener("DOMContentLoaded", () => {
     await destroyPlayers();
     video.src = url;
     video.load();
-    await video.play();
+    try {
+      await video.play();
+    } catch(e){
+      console.log("Autoplay with sound blocked. Tap screen to start.");
+      video.addEventListener("click", () => video.play(), { once:true });
+    }
   }
 
   async function playMPD(url, keyString){
@@ -75,8 +80,13 @@ document.addEventListener("DOMContentLoaded", () => {
         });
       }
     }
-    await shakaPlayer.load(url);
-    await video.play();
+    try {
+      await shakaPlayer.load(url);
+      await video.play();
+    } catch(e){
+      console.log("Autoplay with sound blocked. Tap screen to start.");
+      video.addEventListener("click", () => video.play(), { once:true });
+    }
   }
 
   async function playCurrent(){
