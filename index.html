@@ -204,20 +204,15 @@ document.addEventListener("DOMContentLoaded", () => {
 
     if(post) video.poster = post;
 
-    if(url.endsWith(".mp4")){
-      playMP4(url);
-    }else if(url.endsWith(".mpd")){
-      playMPD(url, key);
-    }else if(url.endsWith(".m3u8")){
-      playM3U8(url);
-    }else{
-      if(url.includes(".mpd")){
-        playMPD(url, key);
-      }else if(url.includes(".m3u8")){
-        playM3U8(url);
-      }else{
-        playMP4(url);
-      }
+    if(url.endsWith(".mp4") || btn.dataset.type === "MP4"){
+  playMP4(url);
+}else if(url.endsWith(".mpd") || btn.dataset.type === "IPTV"){
+  playMPD(url, key);
+}else if(url.endsWith(".m3u8") || btn.dataset.type === "HLS"){
+  playM3U8(url);
+}else{
+  playMP4(url);
+}
     }
   }
 
@@ -241,6 +236,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
