@@ -166,28 +166,7 @@ let currentIndex = -1;
 
   const btn = buttons[index];
 
-  const url  = btn.dataset.manifest;
-  const key  = btn.dataset.key || "";
-  const post = btn.dataset.poster || "";
-
-  if(post) video.poster = post;
-
-  if(url.endsWith(".mp4")){
-    playMP4(url);
-  }else if(url.endsWith(".mpd")){
-    playMPD(url, key);
-  }else if(url.endsWith(".m3u8")){
-    playM3U8(url);
-  }else{
-    if(url.includes(".mpd")){
-      playMPD(url, key);
-    }else if(url.includes(".m3u8")){
-      playM3U8(url);
-    }else{
-      playMP4(url);
-    }
-  }
-}
+  
 
 buttons.forEach((btn, index) => {
 
@@ -210,6 +189,7 @@ buttons.forEach((btn, index) => {
 
 </body>
 </html>
+
 
 
 
