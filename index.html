@@ -2,28 +2,23 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>IPTV Player Auto Rotation</title>
+<title>IPTV Fullscreen Autoplay</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
 
 <style>
-body{
+html, body{
   margin:0;
-  background:#111;
-  color:#fff;
-  font-family:Arial, sans-serif;
-}
-.playerWrap{
-  padding:10px;
-  display:flex;
-  justify-content:center;
+  padding:0;
+  height:100%;
+  background:black;
+  overflow:hidden;
 }
 .videoContainer{
-  width:95%;
-  max-width:900px;
   position: relative;
+  width:100%;
+  height:100%;
   padding-top: 56.25%; /* 16:9 */
-  background:black;
 }
 video{
   position:absolute;
@@ -31,121 +26,36 @@ video{
   left:0;
   width:100%;
   height:100%;
-  object-fit: fill; /* stretch sa buong 16:9 player */
+  object-fit: fill; /* stretch video to fill 16:9 */
   background:black;
-}
-.channels{
-  display:flex;
-  flex-wrap:wrap;
-  gap:10px;
-  padding:10px;
-  justify-content:center;
-}
-.channelBtn{
-  width:140px;
-  cursor:pointer;
-  background:#222;
-  border-radius:6px;
-  overflow:hidden;
-  text-align:center;
-}
-.channelBtn img{
-  width:100%;
-  display:block;
-}
-.channelCode{
-  padding:6px;
-  font-size:14px;
 }
 </style>
 </head>
 <body>
 
-<div class="playerWrap">
-  <div class="videoContainer">
-    <video id="video" controls preload="auto" playsinline></video>
-  </div>
-</div>
-
-<div class="channels">
-
-
-   <!-- MP4 -->
-  <div class="channelBtn"
-       data-manifest="https://dn721906.ca.archive.org/0/items/maging-sino-ka-man-full-movie-robin-padilla-sharon-cuneta-you-tube-360p_202405/Maging_Sino_Ka_Man_Full_Movie_Robin_Padilla_%26_Sharon_Cuneta___YouTube%28360p%29.mp4"
-       data-type="MP4"
-       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
-    <img src="">
-    <div class="channelCode">MP4 SAMPLE1</div>
-  </div>
-
-  <!-- MP4 -->
-  <div class="channelBtn"
-       data-manifest="https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4"
-       data-type="MP4"
-       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
-    <img src="https://i.imgur.com/4NJlK0A.png">
-    <div class="channelCode">MP4 SAMPLE</div>
-  </div>
-
-  <!-- MPD -->
-  <div class="channelBtn"
-       data-manifest="https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd"
-       data-key="f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd"
-       data-type="IPTV"
-       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
-    <img src="https://i.imgur.com/fHBIgs6.png">
-    <div class="channelCode">MPD SAMPLE</div>
-  </div>
-
-
-  <!-- MP4 -->
-  <div class="channelBtn"
-       data-manifest="
-https://ia802809.us.archive.org/18/items/the-journey-with-lyrics-by-lea-salonga-480-p/Can%20We%20Just%20Stop%20And%20Talk%20Awhile%20by%20Lea%20Salonga%281080P_HD%29.mp4"
-       data-type="MP4"
-       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
-    <img src="https://i.imgur.com/4NJlK0A.png">
-    <div class="channelCode">MP4 SAMPLE</div>
-  </div>
-
-  <!-- MPD -->
-  <div class="channelBtn"
-       data-manifest="https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd"
-       data-key="f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd"
-       data-type="IPTV"
-       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
-    <img src="https://i.imgur.com/fHBIgs6.png">
-    <div class="channelCode">MPD SAMPLE</div>
-  </div>
-  <!-- MP4 -->
-  <div class="channelBtn"
-       data-manifest="https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4"
-       data-type="MP4"
-       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
-    <img src="https://i.imgur.com/4NJlK0A.png">
-    <div class="channelCode">MP4 SAMPLE</div>
-  </div>
-
-  <!-- MPD -->
-  <div class="channelBtn"
-       data-manifest="https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd"
-       data-key="f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd"
-       data-type="IPTV"
-       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
-    <img src="https://i.imgur.com/fHBIgs6.png">
-    <div class="channelCode">MPD SAMPLE</div>
-  </div>
-
+<div class="videoContainer">
+  <video id="video" autoplay muted playsinline></video>
 </div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
   const video = document.getElementById("video");
-  const buttons = Array.from(document.querySelectorAll(".channelBtn"));
-  let currentIndex = 0;
 
+  // Playlist MP4 + MPD
+  const playlist = [
+    {
+      type: "MP4",
+      manifest: "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4"
+    },
+    {
+      type: "IPTV",
+      manifest: "https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd",
+      key: "f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd"
+    }
+  ];
+
+  let currentIndex = 0;
   shaka.polyfill.installAll();
   let shakaPlayer = null;
 
@@ -160,13 +70,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   async function playMP4(url){
     await destroyPlayers();
-    video.preload = "auto";
     video.src = url;
     video.load();
-    await new Promise(resolve => {
-      if(video.readyState >= 3) resolve();
-      else video.addEventListener("canplay", resolve, { once:true });
-    });
     await video.play();
   }
 
@@ -185,33 +90,23 @@ document.addEventListener("DOMContentLoaded", () => {
     await video.play();
   }
 
-  async function playByIndex(index){
-    currentIndex = index % buttons.length; // wrap-around loop
-    const btn = buttons[currentIndex];
-    const url = btn.dataset.manifest;
-    const key = btn.dataset.key || "";
-    const post = btn.dataset.poster || "";
-    if(post) video.poster = post;
-
-    if(url.endsWith(".mp4") || btn.dataset.type === "MP4"){
-      playMP4(url);
-    }else if(url.endsWith(".mpd") || btn.dataset.type === "IPTV"){
-      playMPD(url,key);
+  async function playCurrent(){
+    const item = playlist[currentIndex];
+    if(item.type === "MP4"){
+      playMP4(item.manifest);
+    } else if(item.type === "IPTV"){
+      playMPD(item.manifest, item.key);
     }
   }
 
-  // Click handler (optional)
-  buttons.forEach((btn,index) => {
-    btn.addEventListener("click", () => playByIndex(index));
-  });
-
-  // Auto next + loop tuloy-tuloy kahit i-refresh
+  // Loop to next video
   video.addEventListener("ended", () => {
-    playByIndex(currentIndex + 1);
+    currentIndex = (currentIndex + 1) % playlist.length;
+    playCurrent();
   });
 
   // Start first video automatically
-  playByIndex(currentIndex);
+  playCurrent();
 
 });
 </script>
