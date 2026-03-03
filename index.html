@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>IPTV Player Auto-Loop</title>
+<title>IPTV Player Auto-Loop MP4+MPD</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
 
 <style>
 body{
@@ -65,16 +64,7 @@ video{
     <div class="channelCode">MP4 SAMPLE</div>
   </div>
 
-  <!-- HLS / M3U8 -->
-  <div class="channelBtn"
-       data-manifest="https://live20.bozztv.com/giatvplayout7/giatv-208454/playlist.m3u8"
-       data-type="HLS"
-       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
-    <img src="https://i.imgur.com/4NJlK0A.png">
-    <div class="channelCode">HLS SAMPLE</div>
-  </div>
-
-  <!-- Shaka / MPD -->
+  <!-- MPD -->
   <div class="channelBtn"
        data-manifest="https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd"
        data-key="f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd"
@@ -96,14 +86,8 @@ document.addEventListener("DOMContentLoaded", () => {
   shaka.polyfill.installAll();
 
   let shakaPlayer = null;
-  let hls = null;
 
-  // Destroy previous player
   async function destroyPlayers(){
-    if(hls){
-      hls.destroy();
-      hls = null;
-    }
     if(shakaPlayer){
       await shakaPlayer.destroy();
       shakaPlayer = null;
@@ -112,7 +96,9 @@ document.addEventListener("DOMContentLoaded", () => {
     video.load();
   }
 
-  // Smooth MP4 playback
+  // =========================
+  // MP4 playback
+  // =========================
   async function playMP4(url){
     await destroyPlayers();
     video.preload = "auto";
@@ -125,7 +111,9 @@ document.addEventListener("DOMContentLoaded", () => {
     await video.play();
   }
 
-  // Shaka / MPD
+  // =========================
+  // Shaka MPD playback
+  // =========================
   async function playMPD(url, keyString){
     await destroyPlayers();
     shakaPlayer = new shaka.Player(video);
@@ -143,36 +131,8 @@ document.addEventListener("DOMContentLoaded", () => {
     await video.play();
   }
 
-  // HLS / M3U8
-  async function playM3U8(url){
-    await destroyPlayers();
-    if(video.canPlayType("application/vnd.apple.mpegurl")){
-      video.src = url;
-      await video.play();
-    }else if(window.Hls && Hls.isSupported()){
-      hls = new Hls({
-        enableWorker: true,
-        lowLatencyMode: false,
-        maxBufferLength: 30,
-        maxMaxBufferLength: 60,
-        backBufferLength: 30,
-        fragLoadingTimeOut: 20000,
-        manifestLoadingTimeOut: 20000,
-        levelLoadingTimeOut: 20000
-      });
-      hls.loadSource(url);
-      hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, function(){ video.play(); });
-      hls.on(Hls.Events.ERROR, function(event, data){
-        console.warn("HLS Error:", data);
-      });
-    }else{
-      alert("HLS not supported");
-    }
-  }
-
   // =========================
-  // Play by index (auto next)
+  // PLAY BY INDEX
   // =========================
   async function playByIndex(index){
     if(index < 0 || index >= buttons.length) return;
@@ -183,31 +143,31 @@ document.addEventListener("DOMContentLoaded", () => {
     const post = btn.dataset.poster || "";
     if(post) video.poster = post;
 
-    // Decide which player to use
     if(url.endsWith(".mp4") || btn.dataset.type === "MP4"){
       playMP4(url);
     }else if(url.endsWith(".mpd") || btn.dataset.type === "IPTV"){
       playMPD(url, key);
-    }else if(url.endsWith(".m3u8") || btn.dataset.type === "HLS"){
-      playM3U8(url);
-    }else{
-      playMP4(url);
     }
   }
 
-  // Click handler
-  buttons.forEach((btn, index) => {
+  // =========================
+  // CLICK HANDLER
+  // =========================
+  buttons.forEach((btn,index) => {
     btn.addEventListener("click", () => playByIndex(index));
   });
 
-  // Auto next
+  // =========================
+  // AUTO NEXT + LOOP
+  // =========================
   video.addEventListener("ended", () => {
-    const nextIndex = currentIndex + 1;
-    if(nextIndex >= buttons.length) currentIndex = -1; // loop
-    playByIndex((currentIndex + 1) % buttons.length);
+    const nextIndex = (currentIndex + 1) % buttons.length;
+    playByIndex(nextIndex);
   });
 
-  // Start first video automatically
+  // =========================
+  // START FIRST VIDEO
+  // =========================
   playByIndex(0);
 
 });
