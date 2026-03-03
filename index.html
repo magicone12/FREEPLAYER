@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>IPTV Player (MPD + M3U8 + MP4)</title>
+<title>IPTV Player Auto-Loop</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
@@ -55,15 +55,7 @@ video{
 </div>
 
 <div class="channels">
- <!-- CINEMAX -->
-  <div class="channelBtn"
-       data-manifest="https://iwant-video.akamaized.net/dubai/a5112556-0d69-45a9-a86c-23511b61e074/manifest-1.mpd"
-       data-key="b25cee6f46044542b3a8ce229af406c5:fb35c65c13beefa78bc6052eed929777"
-       data-type="IPTV"
-       data-poster="https://wallpaperaccess.com/full/5159563.jpg">
-    <img src="https://i.imgur.com/r8qzNiy.png">
-    <div class="channelCode">CINEMAX</div>
-  </div>
+
   <!-- MP4 -->
   <div class="channelBtn"
        data-manifest="https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4"
@@ -72,23 +64,24 @@ video{
     <img src="https://i.imgur.com/4NJlK0A.png">
     <div class="channelCode">MP4 SAMPLE</div>
   </div>
-   <div class="channelBtn"
+
+  <!-- HLS / M3U8 -->
+  <div class="channelBtn"
        data-manifest="https://live20.bozztv.com/giatvplayout7/giatv-208454/playlist.m3u8"
        data-type="HLS"
        data-poster="https://wallpaperaccess.com/full/5159563.jpg">
     <img src="https://i.imgur.com/4NJlK0A.png">
-    <div class="channelCode">MP4 SAMPLE</div>
+    <div class="channelCode">HLS SAMPLE</div>
   </div>
- 
 
-  <!-- HBO -->
+  <!-- Shaka / MPD -->
   <div class="channelBtn"
        data-manifest="https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd"
        data-key="f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd"
        data-type="IPTV"
        data-poster="https://wallpaperaccess.com/full/5159563.jpg">
     <img src="https://i.imgur.com/fHBIgs6.png">
-    <div class="channelCode">HBO</div>
+    <div class="channelCode">MPD SAMPLE</div>
   </div>
 
 </div>
@@ -105,6 +98,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let shakaPlayer = null;
   let hls = null;
 
+  // Destroy previous player
   async function destroyPlayers(){
     if(hls){
       hls.destroy();
@@ -118,69 +112,59 @@ document.addEventListener("DOMContentLoaded", () => {
     video.load();
   }
 
+  // Smooth MP4 playback
   async function playMP4(url){
+    await destroyPlayers();
+    video.preload = "auto";
+    video.src = url;
+    video.load();
+    await new Promise(resolve => {
+      if(video.readyState >= 3) resolve();
+      else video.addEventListener("canplay", resolve, { once:true });
+    });
+    await video.play();
+  }
 
-  await destroyPlayers();
-
-  video.preload = "auto";
-  video.src = url;
-  video.load();
-
-  await new Promise(resolve => {
-    if (video.readyState >= 3) {
-      resolve();
-    } else {
-      video.addEventListener("canplay", resolve, { once:true });
-    }
-  });
-
-  await video.play();
-}
+  // Shaka / MPD
   async function playMPD(url, keyString){
     await destroyPlayers();
-
     shakaPlayer = new shaka.Player(video);
-
     if(keyString){
       const p = keyString.split(":");
       if(p.length === 2){
         shakaPlayer.configure({
           drm:{
-            clearKeys:{
-              [p[0].trim()] : p[1].trim()
-            }
+            clearKeys:{ [p[0].trim()]: p[1].trim() }
           }
         });
       }
     }
-
     await shakaPlayer.load(url);
     await video.play();
   }
 
+  // HLS / M3U8
   async function playM3U8(url){
     await destroyPlayers();
-
     if(video.canPlayType("application/vnd.apple.mpegurl")){
       video.src = url;
       await video.play();
     }else if(window.Hls && Hls.isSupported()){
-     hls = new Hls({
-  enableWorker: true,
-  lowLatencyMode: false,
-
-  maxBufferLength: 30,
-  maxMaxBufferLength: 60,
-  backBufferLength: 30,
-
-  fragLoadingTimeOut: 20000,
-  manifestLoadingTimeOut: 20000,
-  levelLoadingTimeOut: 20000
-});
+      hls = new Hls({
+        enableWorker: true,
+        lowLatencyMode: false,
+        maxBufferLength: 30,
+        maxMaxBufferLength: 60,
+        backBufferLength: 30,
+        fragLoadingTimeOut: 20000,
+        manifestLoadingTimeOut: 20000,
+        levelLoadingTimeOut: 20000
+      });
       hls.loadSource(url);
       hls.attachMedia(video);
-      hls.on(Hls.Events.MANIFEST_PARSED, function(){
-        video.play();
+      hls.on(Hls.Events.MANIFEST_PARSED, function(){ video.play(); });
+      hls.on(Hls.Events.ERROR, function(event, data){
+        console.warn("HLS Error:", data);
       });
     }else{
       alert("HLS not supported");
@@ -188,67 +172,46 @@ document.addEventListener("DOMContentLoaded", () => {
   }
 
   // =========================
-  // AUTO PLAY BY INDEX
+  // Play by index (auto next)
   // =========================
   async function playByIndex(index){
-
     if(index < 0 || index >= buttons.length) return;
-
     currentIndex = index;
-
     const btn = buttons[index];
-
     const url  = btn.dataset.manifest;
     const key  = btn.dataset.key || "";
     const post = btn.dataset.poster || "";
-
     if(post) video.poster = post;
 
+    // Decide which player to use
     if(url.endsWith(".mp4") || btn.dataset.type === "MP4"){
-  playMP4(url);
-}else if(url.endsWith(".mpd") || btn.dataset.type === "IPTV"){
-  playMPD(url, key);
-}else if(url.endsWith(".m3u8") || btn.dataset.type === "HLS"){
-  playM3U8(url);
-}else{
-  playMP4(url);
-}
+      playMP4(url);
+    }else if(url.endsWith(".mpd") || btn.dataset.type === "IPTV"){
+      playMPD(url, key);
+    }else if(url.endsWith(".m3u8") || btn.dataset.type === "HLS"){
+      playM3U8(url);
+    }else{
+      playMP4(url);
     }
   }
 
-  // click = play
+  // Click handler
   buttons.forEach((btn, index) => {
-    btn.addEventListener("click", () => {
-      playByIndex(index);
-    });
+    btn.addEventListener("click", () => playByIndex(index));
   });
 
-  // auto next
+  // Auto next
   video.addEventListener("ended", () => {
     const nextIndex = currentIndex + 1;
-    if(nextIndex < buttons.length){
-      playByIndex(nextIndex);
-    }
+    if(nextIndex >= buttons.length) currentIndex = -1; // loop
+    playByIndex((currentIndex + 1) % buttons.length);
   });
+
+  // Start first video automatically
+  playByIndex(0);
 
 });
 </script>
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
