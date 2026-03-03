@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>IPTV Player 16:9 Stretch</title>
+<title>IPTV Player Auto Rotation</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
 
@@ -22,7 +22,7 @@ body{
   width:95%;
   max-width:900px;
   position: relative;
-  padding-top: 56.25%; /* 16:9 ratio */
+  padding-top: 56.25%; /* 16:9 */
   background:black;
 }
 video{
@@ -31,7 +31,7 @@ video{
   left:0;
   width:100%;
   height:100%;
-  object-fit: fill; /* stretch video to fill 16:9 container */
+  object-fit: fill; /* stretch sa buong 16:9 player */
   background:black;
 }
 .channels{
@@ -68,6 +68,7 @@ video{
 </div>
 
 <div class="channels">
+
 
    <!-- MP4 -->
   <div class="channelBtn"
@@ -143,10 +144,9 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const video = document.getElementById("video");
   const buttons = Array.from(document.querySelectorAll(".channelBtn"));
-  let currentIndex = -1;
+  let currentIndex = 0;
 
   shaka.polyfill.installAll();
-
   let shakaPlayer = null;
 
   async function destroyPlayers(){
@@ -158,7 +158,6 @@ document.addEventListener("DOMContentLoaded", () => {
     video.load();
   }
 
-  // MP4 playback
   async function playMP4(url){
     await destroyPlayers();
     video.preload = "auto";
@@ -171,7 +170,6 @@ document.addEventListener("DOMContentLoaded", () => {
     await video.play();
   }
 
-  // MPD playback
   async function playMPD(url, keyString){
     await destroyPlayers();
     shakaPlayer = new shaka.Player(video);
@@ -179,9 +177,7 @@ document.addEventListener("DOMContentLoaded", () => {
       const p = keyString.split(":");
       if(p.length === 2){
         shakaPlayer.configure({
-          drm:{
-            clearKeys:{ [p[0].trim()]: p[1].trim() }
-          }
+          drm:{ clearKeys:{ [p[0].trim()]: p[1].trim() } }
         });
       }
     }
@@ -189,13 +185,11 @@ document.addEventListener("DOMContentLoaded", () => {
     await video.play();
   }
 
-  // Play by index
   async function playByIndex(index){
-    if(index < 0 || index >= buttons.length) return;
-    currentIndex = index;
-    const btn = buttons[index];
-    const url  = btn.dataset.manifest;
-    const key  = btn.dataset.key || "";
+    currentIndex = index % buttons.length; // wrap-around loop
+    const btn = buttons[currentIndex];
+    const url = btn.dataset.manifest;
+    const key = btn.dataset.key || "";
     const post = btn.dataset.poster || "";
     if(post) video.poster = post;
 
@@ -206,19 +200,18 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // Click handler
+  // Click handler (optional)
   buttons.forEach((btn,index) => {
     btn.addEventListener("click", () => playByIndex(index));
   });
 
-  // Auto next + loop
+  // Auto next + loop tuloy-tuloy kahit i-refresh
   video.addEventListener("ended", () => {
-    const nextIndex = (currentIndex + 1) % buttons.length;
-    playByIndex(nextIndex);
+    playByIndex(currentIndex + 1);
   });
 
   // Start first video automatically
-  playByIndex(0);
+  playByIndex(currentIndex);
 
 });
 </script>
