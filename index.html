@@ -205,40 +205,12 @@ buttons.forEach((btn, index) => {
   }
 
 });
-    btn.addEventListener("click", () => {
-
-      const url  = btn.dataset.manifest;
-      const key  = btn.dataset.key || "";
-      const post = btn.dataset.poster || "";
-
-      if(post) video.poster = post;
-
-      if(url.endsWith(".mp4")){
-        playMP4(url);
-      }else if(url.endsWith(".mpd")){
-        playMPD(url, key);
-      }else if(url.endsWith(".m3u8")){
-        playM3U8(url);
-      }else{
-        // fallback
-        if(url.includes(".mpd")){
-          playMPD(url, key);
-        }else if(url.includes(".m3u8")){
-          playM3U8(url);
-        }else{
-          playMP4(url);
-        }
-      }
-
-    });
-
-  });
-
-});
+    
 </script>
 
 </body>
 </html>
+
 
 
 
