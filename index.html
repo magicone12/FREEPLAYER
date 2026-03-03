@@ -91,7 +91,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const video = document.getElementById("video");
   const buttons = Array.from(document.querySelectorAll(".channelBtn"));
-let currentIndex = -1;
+  let currentIndex = -1;
 
   shaka.polyfill.installAll();
 
@@ -118,7 +118,6 @@ let currentIndex = -1;
   }
 
   async function playMPD(url, keyString){
-
     await destroyPlayers();
 
     shakaPlayer = new shaka.Player(video);
@@ -141,7 +140,6 @@ let currentIndex = -1;
   }
 
   async function playM3U8(url){
-
     await destroyPlayers();
 
     if(video.canPlayType("application/vnd.apple.mpegurl")){
@@ -158,37 +156,62 @@ let currentIndex = -1;
       alert("HLS not supported");
     }
   }
+
+  // =========================
+  // AUTO PLAY BY INDEX
+  // =========================
   async function playByIndex(index){
 
-  if(index < 0 || index >= buttons.length) return;
+    if(index < 0 || index >= buttons.length) return;
 
-  currentIndex = index;
+    currentIndex = index;
 
-  const btn = buttons[index];
+    const btn = buttons[index];
 
-  
+    const url  = btn.dataset.manifest;
+    const key  = btn.dataset.key || "";
+    const post = btn.dataset.poster || "";
 
-buttons.forEach((btn, index) => {
+    if(post) video.poster = post;
 
-  btn.addEventListener("click", () => {
-    playByIndex(index);
+    if(url.endsWith(".mp4")){
+      playMP4(url);
+    }else if(url.endsWith(".mpd")){
+      playMPD(url, key);
+    }else if(url.endsWith(".m3u8")){
+      playM3U8(url);
+    }else{
+      if(url.includes(".mpd")){
+        playMPD(url, key);
+      }else if(url.includes(".m3u8")){
+        playM3U8(url);
+      }else{
+        playMP4(url);
+      }
+    }
+  }
+
+  // click = play
+  buttons.forEach((btn, index) => {
+    btn.addEventListener("click", () => {
+      playByIndex(index);
+    });
+  });
+
+  // auto next
+  video.addEventListener("ended", () => {
+    const nextIndex = currentIndex + 1;
+    if(nextIndex < buttons.length){
+      playByIndex(nextIndex);
+    }
   });
 
 });
-  video.addEventListener("ended", () => {
-
-  const nextIndex = currentIndex + 1;
-
-  if(nextIndex < buttons.length){
-    playByIndex(nextIndex);
-  }
-
-});
-    
 </script>
 
 </body>
 </html>
+
 
 
 
