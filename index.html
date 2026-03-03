@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<title>IPTV Fullscreen 16:9 Autoplay with Sound</title>
+<title>IPTV Player</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/shaka-player/4.3.8/shaka-player.compiled.js"></script>
 
@@ -18,19 +18,34 @@ html, body{
 video{
   width:100%;
   height:100%;
-  object-fit: fill; /* stretch to fill screen */
+  object-fit: fill; /* stretch video to fill screen */
   background:black;
+}
+#titleOverlay{
+  position:absolute;
+  top:10px;
+  left:50%;
+  transform:translateX(-50%);
+  background: rgba(0,0,0,0.5);
+  color:#fff;
+  font-family: Arial, sans-serif;
+  font-size: 24px;
+  padding: 8px 16px;
+  border-radius: 8px;
+  z-index: 10;
 }
 </style>
 </head>
 <body>
 
 <video id="video" autoplay playsinline></video>
+<div id="titleOverlay"></div>
 
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
   const video = document.getElementById("video");
+  const titleOverlay = document.getElementById("titleOverlay");
 
   const playlist = [
      {
@@ -45,6 +60,17 @@ document.addEventListener("DOMContentLoaded", () => {
       type: "IPTV",
       manifest: "https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd",
       key: "f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd"
+    },
+    {
+      type: "MP4",
+      manifest: "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4",
+      title: "MP4 Sample - If Only"
+    },
+    {
+      type: "IPTV",
+      manifest: "https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd",
+      key: "f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd",
+      title: "MPD Sample - OroPlatamata"
     }
   ];
 
@@ -61,7 +87,13 @@ document.addEventListener("DOMContentLoaded", () => {
     video.load();
   }
 
-  async function playMP4(url){
+  function updateTitle(title){
+    document.title = title; // browser tab
+    titleOverlay.textContent = title; // on-screen
+  }
+
+  async function playMP4(url, title){
+    updateTitle(title);
     await destroyPlayers();
     video.src = url;
     video.load();
@@ -73,7 +105,8 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  async function playMPD(url, keyString){
+  async function playMPD(url, keyString, title){
+    updateTitle(title);
     await destroyPlayers();
     shakaPlayer = new shaka.Player(video);
     if(keyString){
@@ -96,9 +129,9 @@ document.addEventListener("DOMContentLoaded", () => {
   async function playCurrent(){
     const item = playlist[currentIndex];
     if(item.type === "MP4"){
-      playMP4(item.manifest);
+      playMP4(item.manifest, item.title);
     } else if(item.type === "IPTV"){
-      playMPD(item.manifest, item.key);
+      playMPD(item.manifest, item.key, item.title);
     }
   }
 
@@ -118,4 +151,3 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
-
