@@ -79,24 +79,18 @@ video{
   pointer-events:none;
 }
 
-  .playerWrap{
-  padding:10px;
-  text-align:center;
-  position:relative;
-}
+
 </style>
 </head>
 <body>
 
-<div class="playerWrap">
-  <video id="video" controls></video>
+<video id="video" autoplay playsinline></video>
 
-  <div id="titleOverlay"></div>
-  <div id="secondText">SECOND TEXT</div>
+<div id="titleOverlay"></div>
+<div id="secondText">SECOND TEXT</div>
 
-  <img id="logo1" src="https://i.imgur.com/O5jBcL2.png">
-  <img id="logo2" src="https://i.imgur.com/O5jBcL2.png">
-</div>
+<img id="logo1" src="logo1.png">
+<img id="logo2" src="logo2.png">
   
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -200,6 +194,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
