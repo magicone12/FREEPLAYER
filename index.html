@@ -199,42 +199,71 @@ document.addEventListener("DOMContentLoaded", () => {
     logo2.style.display = item.logo2 ? "block" : "none";
   }
 
-  async function playMP4(url, item){
-    updateOverlays(item);
-    await destroyPlayers();
-    video.src = url;
-    video.load();
-    try { await video.play(); } 
-    catch(e){ video.addEventListener("click", () => video.play(), { once:true }); }
+ async function playMP4(url, item){
+  updateOverlays(item);
+  await destroyPlayers();
+  video.src = url;
+  video.load();
+
+  // Retry mechanism kung may error sa video
+  let retryTimeout;
+  function retryPlay(){
+    retryTimeout = setTimeout(async () => {
+      try {
+        await video.play();
+      } catch(e){
+        retryPlay();
+      }
+    }, 3000);
   }
 
-  async function playMPD(url, keyString, item){
-    updateOverlays(item);
-    await destroyPlayers();
-    shakaPlayer = new shaka.Player(video);
-    if(keyString){
-      const [k1, k2] = keyString.split(":");
-      shakaPlayer.configure({ drm:{ clearKeys:{[k1.trim()]: k2.trim()} } });
-    }
-    try { await shakaPlayer.load(url); await video.play(); } 
-    catch(e){ video.addEventListener("click", () => video.play(), { once:true }); }
+  video.onerror = () => {
+    console.log("Video error, retrying in 3s...");
+    retryPlay();
+  };
+
+  try { await video.play(); } 
+  catch(e){ retryPlay(); }
+}
+
+async function playMPD(url, keyString, item){
+  updateOverlays(item);
+  await destroyPlayers();
+  shakaPlayer = new shaka.Player(video);
+
+  if(keyString){
+    const [k1, k2] = keyString.split(":");
+    shakaPlayer.configure({ drm:{ clearKeys:{[k1.trim()]: k2.trim()} } });
   }
 
-  async function playNext(){
-    const item = playlist[currentIndex];
+  // Retry on Shaka network error
+  shakaPlayer.addEventListener('error', (event) => {
+    const shakaError = event.detail;
+    console.warn("Shaka Player error, retrying in 3s...", shakaError);
+    setTimeout(async () => {
+      try { await shakaPlayer.load(url); await video.play(); } 
+      catch(e){ console.log("Retry failed, will retry again.", e); }
+    }, 3000);
+  });
 
-    if(item.type === "MP4"){
-      await playMP4(item.manifest, item);
-    } else if(item.type === "IPTV"){
-      await playMPD(item.manifest, item.key, item);
-    }
+  try { await shakaPlayer.load(url); await video.play(); } 
+  catch(e){ console.log("Autoplay failed, will retry.", e); }
+}
 
-    video.onended = () => {
-      currentIndex = (currentIndex + 1) % playlist.length;
-      playNext();
-    };
+async function playNext(){
+  const item = playlist[currentIndex];
+
+  if(item.type === "MP4"){
+    await playMP4(item.manifest, item);
+  } else if(item.type === "IPTV"){
+    await playMPD(item.manifest, item.key, item);
   }
 
+  video.onended = () => {
+    currentIndex = (currentIndex + 1) % playlist.length;
+    playNext();
+  };
+}
   // Start playlist autoplay
   playNext();
 
@@ -245,6 +274,7 @@ document.addEventListener("DOMContentLoaded", () => {
 </script>
 </body>
 </html>
+
 
 
 
