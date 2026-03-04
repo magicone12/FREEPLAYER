@@ -52,6 +52,32 @@ video{
 
   z-index:10;
 }
+
+  #logo1{
+  position:absolute;
+
+  top:20px;      /* pwesto */
+  right:20px;
+
+  width:80px;    /* laki ng logo */
+  height:auto;
+
+  z-index:10;
+  pointer-events:none;
+}
+
+#logo2{
+  position:absolute;
+
+  top:20px;      /* pwesto */
+  left:20px;
+
+  width:80px;    /* laki ng logo */
+  height:auto;
+
+  z-index:10;
+  pointer-events:none;
+}
 </style>
 </head>
 <body>
@@ -59,6 +85,8 @@ video{
 <video id="video" autoplay playsinline></video>
 <div id="titleOverlay"></div>
 <div id="secondText">SECOND TEXT</div>
+  <div id="logo1" src="logo1.png"></div>
+<div id="logo2" src="logo2.png"></div>
   
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -162,6 +190,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
