@@ -78,15 +78,25 @@ video{
   z-index:10;
   pointer-events:none;
 }
+
+  .playerWrap{
+  padding:10px;
+  text-align:center;
+  position:relative;
+}
 </style>
 </head>
 <body>
 
-<video id="video" autoplay playsinline></video>
-<div id="titleOverlay"></div>
-<div id="secondText">SECOND TEXT</div>
-  <div id="logo1" src="logo1.png"></div>
-<div id="logo2" src="logo2.png"></div>
+<div class="playerWrap">
+  <video id="video" controls></video>
+
+  <div id="titleOverlay"></div>
+  <div id="secondText">SECOND TEXT</div>
+
+  <img id="logo1" src="logo1.png">
+  <img id="logo2" src="logo2.png">
+</div>
   
 <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -190,6 +200,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
