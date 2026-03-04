@@ -53,6 +53,23 @@ video{
   z-index:10;
 }
 
+    #secondText2{
+  position:absolute;
+
+  bottom:50px;   /* adjust mo pwesto (ibaba) */
+  left:50px;     /* adjust mo pwesto (kaliwa) */
+
+
+  color:#fff;
+
+  font-family: Arial, sans-serif;
+  font-size: 22px;   /* 👉 LAKI / LIIT ng text */
+  padding: 8px 14px;
+  border-radius: 6px;
+
+  z-index:10;
+}
+
   #logo1{
   position:absolute;
 
@@ -88,6 +105,7 @@ video{
 
 <div id="titleOverlay"></div>
 <div id="secondText">SECOND TEXT</div>
+  <div id="secondText2">SECOND TEXT2</div>
 <img id="logo1" >
 <img id="logo2" >
 
@@ -110,6 +128,7 @@ document.addEventListener("DOMContentLoaded", () => {
       key: "f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd",
       title: "Oro Plata mata",
       secondText: "Parental Guidance",
+   secondText2: "TEST BROADCAST",
       logo1: "https://i.imgur.com/tRyRFmM.png"
     },
    {
@@ -274,6 +293,7 @@ async function playNext(){
 </script>
 </body>
 </html>
+
 
 
 
