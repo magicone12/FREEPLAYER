@@ -35,19 +35,38 @@ video{
   border-radius: 8px;
   z-index: 10;
 }
+
+  #secondText{
+  position:absolute;
+
+  bottom:30px;   /* adjust mo pwesto (ibaba) */
+  left:20px;     /* adjust mo pwesto (kaliwa) */
+
+  background: rgba(0,0,0,0.5);
+  color:#fff;
+
+  font-family: Arial, sans-serif;
+  font-size: 24px;   /* 👉 LAKI / LIIT ng text */
+  padding: 8px 14px;
+  border-radius: 6px;
+
+  z-index:10;
+}
 </style>
 </head>
 <body>
 
 <video id="video" autoplay playsinline></video>
 <div id="titleOverlay"></div>
-
+<div id="secondText">SECOND TEXT</div>
+  
 <script>
 document.addEventListener("DOMContentLoaded", () => {
 
   const video = document.getElementById("video");
   const titleOverlay = document.getElementById("titleOverlay");
-
+ const secondText = document.getElementById("secondText");
+ 
   const playlist = [
      {
       type: "MP4",
@@ -66,7 +85,8 @@ document.addEventListener("DOMContentLoaded", () => {
       title: "MPD Sample - OroPlatamata"
     }
   ];
-
+   secondText.textContent = "LIVE NOW";
+  
   let currentIndex = 0;
   shaka.polyfill.installAll();
   let shakaPlayer = null;
@@ -142,6 +162,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
 </body>
 </html>
+
 
 
 
