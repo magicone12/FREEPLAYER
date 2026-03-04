@@ -93,110 +93,84 @@ video{
 <img id="logo2" src="logo2.png">
   
 <script>
-document.addEventListener("DOMContentLoaded", () => {
-
+  // 1️⃣ Kunin ang video at overlays
   const video = document.getElementById("video");
   const titleOverlay = document.getElementById("titleOverlay");
- const secondText = document.getElementById("secondText");
- 
- const playlist = [
-  {
-    type: "MP4",
-    manifest: "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4",
-    title: "MP4 Sample 1"
-  },
-  {
-    type: "MP4",
-    manifest: "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4",
-    title: "MP4 Sample 2",
-    secondText: "Parental Guidance",
-    logo1: "https://i.imgur.com/wo8vkU8.png",
-    logo2: "https://i.imgur.com/logo2.png"
-  },
-  {
-    type: "IPTV",
-    manifest: "https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd",
-    key: "f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd",
-    title: "MPD Sample - OroPlatamata"
-  }
-];
-  
-  
+  const secondText   = document.getElementById("secondText");
+  const logo1 = document.getElementById("logo1");
+  const logo2 = document.getElementById("logo2");
+
+  // 2️⃣ Playlist
+  const playlist = [
+    {
+      type: "MP4",
+      manifest: "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4",
+      title: "MP4 Sample 1"
+    },
+    {
+      type: "MP4",
+      manifest: "https://ia600802.us.archive.org/29/items/if-only-lea-salonga-lyrics-720-p-hd/If%20Only%20-%20Lea%20Salonga%20-%20Lyrics%28720P_HD%29.ia.mp4",
+      title: "MP4 Sample 2",
+      secondText: "Parental Guidance",
+      logo1: "https://i.imgur.com/wo8vkU8.png",
+      logo2: "https://i.imgur.com/logo2.png"
+    },
+    {
+      type: "IPTV",
+      manifest: "https://iwant-video.akamaized.net/oroplatamata/8c243b88-5298-451d-818d-18c037fdf1e1/manifest.mpd",
+      key: "f811228bb456420e853364c8e884e3e9:3beff922390acae0b69151022a7846cd",
+      title: "MPD Sample - OroPlatamata"
+    }
+  ];
+
+  // 3️⃣ Current index at playNext function
   let currentIndex = 0;
-  shaka.polyfill.installAll();
-  let shakaPlayer = null;
 
-  async function destroyPlayers(){
-    if(shakaPlayer){
-      await shakaPlayer.destroy();
-      shakaPlayer = null;
-    }
-    video.removeAttribute("src");
-    video.load();
-  }
-
-  function updateTitle(title){
-    document.title = title; 
-    titleOverlay.textContent = title; 
-  }
-
-  async function playMP4(url, title){
-    updateTitle(title);
-    await destroyPlayers();
-    video.src = url;
-    video.load();
-    try {
-      await video.play();
-    } catch(e){
-      console.log("Autoplay with sound blocked. Tap screen to start.");
-      video.addEventListener("click", () => video.play(), { once:true });
-    }
-  }
-
-  async function playMPD(url, keyString, title){
-    updateTitle(title);
-    await destroyPlayers();
-    shakaPlayer = new shaka.Player(video);
-    if(keyString){
-      const p = keyString.split(":");
-      if(p.length === 2){
-        shakaPlayer.configure({
-          drm:{ clearKeys:{ [p[0].trim()]: p[1].trim() } }
-        });
-      }
-    }
-    try {
-      await shakaPlayer.load(url);
-      await video.play();
-    } catch(e){
-      console.log("Autoplay with sound blocked. Tap screen to start.");
-      video.addEventListener("click", () => video.play(), { once:true });
-    }
-  }
-
-  async function playCurrent(){
+  async function playNext() {
     const item = playlist[currentIndex];
-    if(item.type === "MP4"){
-      playMP4(item.manifest, item.title);
-    } else if(item.type === "IPTV"){
-      playMPD(item.manifest, item.key, item.title);
+
+    // Title
+    titleOverlay.textContent = item.title || "";
+
+    // Second text
+    secondText.textContent = item.secondText || "";
+    secondText.style.display = item.secondText ? "block" : "none";
+
+    // Logos
+    logo1.src = item.logo1 || "";
+    logo1.style.display = item.logo1 ? "block" : "none";
+
+    logo2.src = item.logo2 || "";
+    logo2.style.display = item.logo2 ? "block" : "none";
+
+    // Play video
+    if(item.type === "MP4") {
+      video.src = item.manifest;
+      video.play();
+    } else if(item.type === "IPTV") {
+      shakaPlayer = new shaka.Player(video);
+      if(item.key){
+        const [k1, k2] = item.key.split(":");
+        shakaPlayer.configure({ drm:{ clearKeys:{[k1.trim()]: k2.trim()} } });
+      }
+      await shakaPlayer.load(item.manifest);
+      video.play();
     }
+
+    // auto next sa end
+    video.onended = () => {
+      currentIndex++;
+      if(currentIndex >= playlist.length) currentIndex = 0; // loop
+      playNext();
+    };
   }
 
-  video.addEventListener("ended", () => {
-    currentIndex = (currentIndex + 1) % playlist.length;
-    playCurrent();
-  });
-
-  playCurrent();
-
-  video.requestFullscreen?.();
-
-});
+  // 4️⃣ Start autoplay
+  playNext();
 </script>
-
 </body>
 </html>
+
 
 
 
