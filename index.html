@@ -312,7 +312,48 @@ video.addEventListener("waiting", () => {
 });
   
   
-  
+  // INTERNET WATCHDOG
+let internetTimer = null;
+
+// kapag nawalan internet
+window.addEventListener("offline", () => {
+  console.log("Internet lost");
+
+  internetTimer = setTimeout(() => {
+    console.log("No internet for 30s, refreshing page...");
+    location.reload();
+  }, 30000); // 30 seconds
+});
+
+// kapag bumalik internet
+window.addEventListener("online", () => {
+  console.log("Internet restored");
+
+  if(internetTimer){
+    clearTimeout(internetTimer);
+    internetTimer = null;
+  }
+
+  playNext(); // resume playlist
+});
+
+// retry kapag buffering
+video.addEventListener("stalled", () => {
+  console.log("Video stalled, retrying...");
+  setTimeout(() => {
+    video.play().catch(()=>{});
+  }, 3000);
+});
+
+video.addEventListener("waiting", () => {
+  console.log("Buffering detected, retrying...");
+  setTimeout(() => {
+    video.play().catch(()=>{});
+  }, 3000);
+});
+
+// Start playlist autoplay
+playNext();
   // Start playlist autoplay
   playNext();
 
@@ -323,6 +364,7 @@ video.addEventListener("waiting", () => {
 </script>
 </body>
 </html>
+
 
 
 
