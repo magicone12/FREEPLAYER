@@ -287,6 +287,32 @@ async function playNext(){
     playNext();
   };
 }
+ 
+  
+  
+  // AUTO RESUME kapag nawalan ng internet
+window.addEventListener("online", () => {
+  console.log("Internet restored, resuming playback...");
+  playNext();
+});
+
+// Kapag nag buffering o huminto ang video
+video.addEventListener("stalled", () => {
+  console.log("Video stalled, retrying...");
+  setTimeout(() => {
+    video.play().catch(()=>{});
+  }, 3000);
+});
+
+video.addEventListener("waiting", () => {
+  console.log("Buffering detected, retrying...");
+  setTimeout(() => {
+    video.play().catch(()=>{});
+  }, 3000);
+});
+  
+  
+  
   // Start playlist autoplay
   playNext();
 
@@ -297,6 +323,7 @@ async function playNext(){
 </script>
 </body>
 </html>
+
 
 
 
