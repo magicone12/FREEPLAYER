@@ -96,13 +96,36 @@ video{
   pointer-events:none;
 }
 
+#playlistPanel{
+  position:absolute;
+  top:0;
+  left:0;
+  width:260px;
+  height:100%;
+  background:rgba(0,0,0,0.75);
+  overflow-y:auto;
+  z-index:20;
+  padding-top:20px;
+}
 
+.playItem{
+  padding:12px 15px;
+  color:#fff;
+  font-family:Arial;
+  font-size:15px;
+  border-bottom:1px solid rgba(255,255,255,0.15);
+  cursor:pointer;
+}
+
+.playItem:hover{
+  background:rgba(255,255,255,0.1);
+}
 </style>
 </head>
 <body>
 
 <video id="video" autoplay playsinline></video>
-
+<div id="playlistPanel"></div>
 <div id="titleOverlay"></div>
 <div id="secondText"></div>
   <div id="secondText2"></div>
@@ -119,6 +142,32 @@ document.addEventListener("DOMContentLoaded", () => {
   const logo1 = document.getElementById("logo1");
   const logo2 = document.getElementById("logo2");
 
+  const playlistPanel = document.getElementById("playlistPanel");
+
+function buildPlaylistUI(){
+  playlistPanel.innerHTML = "";
+
+  playlist.forEach((item,index)=>{
+    const div = document.createElement("div");
+    div.className = "playItem";
+    div.textContent = item.title;
+
+    div.onclick = async () => {
+
+      currentIndex = index;
+
+      if(item.type === "MP4"){
+        await playMP4(item.manifest,item);
+      }else if(item.type === "IPTV"){
+        await playMPD(item.manifest,item.key,item);
+      }
+
+      video.requestFullscreen?.();
+    };
+
+    playlistPanel.appendChild(div);
+  });
+}
   // Playlist
   const playlist = [
 
@@ -356,7 +405,7 @@ video.addEventListener("waiting", () => {
 playNext();
   // Start playlist autoplay
   playNext();
-
+buildPlaylistUI();
   // Optional: Fullscreen automatically
   video.requestFullscreen?.();
 
@@ -364,6 +413,7 @@ playNext();
 </script>
 </body>
 </html>
+
 
 
 
