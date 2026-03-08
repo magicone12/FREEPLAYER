@@ -339,8 +339,17 @@ async function playMPD(url, keyString, item){
     }, 3000);
   });
 
-  try { await shakaPlayer.load(url); await video.play(); } 
-  catch(e){ console.log("Autoplay failed, will retry.", e); }
+ try { 
+  await shakaPlayer.load(url); 
+  await video.play();
+
+  const savedTime = localStorage.getItem(resumeKey);
+  if(savedTime){
+    video.currentTime = savedTime;
+  }
+
+} catch(e){ 
+  console.log("Autoplay failed, will retry.", e); 
 }
 
 
@@ -427,8 +436,7 @@ video.addEventListener("waiting", () => {
   }, 3000);
 });
 
-// Start playlist autoplay
-playNext();
+
   // Start playlist autoplay
   playNext();
 buildPlaylistUI();
@@ -449,12 +457,11 @@ video.addEventListener("click", () => {
   video.requestFullscreen?.();
 
 });
-    video.addEventListener("click", () => {
-  playlistPanel.style.display = "block";
-});
+
 </script>
 </body>
 </html>
+
 
 
 
