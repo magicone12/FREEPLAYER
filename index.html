@@ -301,7 +301,11 @@ if(savedTime){
     retryPlay();
   };
 
-  try { await video.play(); } 
+  try { await video.play();  const savedTime = localStorage.getItem(resumeKey);
+if(savedTime){
+  video.currentTime = savedTime;
+}
+   } 
   catch(e){ retryPlay(); }
 }
 
@@ -320,8 +324,18 @@ async function playMPD(url, keyString, item){
     const shakaError = event.detail;
     console.warn("Shaka Player error, retrying in 3s...", shakaError);
     setTimeout(async () => {
-      try { await shakaPlayer.load(url); await video.play(); } 
-      catch(e){ console.log("Retry failed, will retry again.", e); }
+    try { 
+  await shakaPlayer.load(url); 
+  await video.play();
+
+  const savedTime = localStorage.getItem(resumeKey);
+  if(savedTime){
+    video.currentTime = savedTime;
+  }
+
+} catch(e){ 
+  console.log("Autoplay failed, will retry.", e); 
+}
     }, 3000);
   });
 
@@ -329,11 +343,7 @@ async function playMPD(url, keyString, item){
   catch(e){ console.log("Autoplay failed, will retry.", e); }
 }
 
-  const savedTime = localStorage.getItem(resumeKey);
-if(savedTime){
-  video.currentTime = savedTime;
-}
-  
+
 async function playNext(){
   const item = playlist[currentIndex];
 
@@ -445,6 +455,7 @@ video.addEventListener("click", () => {
 </script>
 </body>
 </html>
+
 
 
 
