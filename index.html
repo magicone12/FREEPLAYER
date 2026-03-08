@@ -408,6 +408,19 @@ playNext();
   // Start playlist autoplay
   playNext();
 buildPlaylistUI();
+  let playlistVisible = true;
+
+video.addEventListener("click", () => {
+
+  if(playlistVisible){
+    playlistPanel.style.display = "none";
+    playlistVisible = false;
+  }else{
+    playlistPanel.style.display = "block";
+    playlistVisible = true;
+  }
+
+});
   // Optional: Fullscreen automatically
   video.requestFullscreen?.();
 
@@ -418,6 +431,7 @@ buildPlaylistUI();
 </script>
 </body>
 </html>
+
 
 
 
