@@ -141,7 +141,7 @@ document.addEventListener("DOMContentLoaded", () => {
    const secondText2 = document.getElementById("secondText2");
   const logo1 = document.getElementById("logo1");
   const logo2 = document.getElementById("logo2");
-
+ let resumeKey = "video-resume-time";
   const playlistPanel = document.getElementById("playlistPanel");
 
 function buildPlaylistUI(){
@@ -285,6 +285,11 @@ function buildPlaylistUI(){
     retryTimeout = setTimeout(async () => {
       try {
         await video.play();
+
+        const savedTime = localStorage.getItem(resumeKey);
+if(savedTime){
+  video.currentTime = savedTime;
+}
       } catch(e){
         retryPlay();
       }
@@ -324,6 +329,11 @@ async function playMPD(url, keyString, item){
   catch(e){ console.log("Autoplay failed, will retry.", e); }
 }
 
+  const savedTime = localStorage.getItem(resumeKey);
+if(savedTime){
+  video.currentTime = savedTime;
+}
+  
 async function playNext(){
   const item = playlist[currentIndex];
 
@@ -354,7 +364,11 @@ video.addEventListener("stalled", () => {
     video.play().catch(()=>{});
   }, 3000);
 });
-
+  
+video.addEventListener("timeupdate", () => {
+  localStorage.setItem(resumeKey, video.currentTime);
+});
+  
 video.addEventListener("waiting", () => {
   console.log("Buffering detected, retrying...");
   setTimeout(() => {
@@ -431,6 +445,7 @@ video.addEventListener("click", () => {
 </script>
 </body>
 </html>
+
 
 
 
