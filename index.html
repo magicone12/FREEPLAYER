@@ -150,13 +150,43 @@ video{
     transform:translateX(-100%);
   }
 }
+
+  #marqueeText{
+  position:absolute;
+  bottom:0;
+  left:0;
+  width:100%;
+  overflow:hidden;
+
+  background:rgba(0,0,0,0.8); /* background color */
+  color:#fff;
+
+  font-family:Arial;
+  font-size:18px;
+  padding:8px 0;
+
+  z-index:15;
+  display:none; /* default naka hide */
+}
+
+#marqueeContent{
+  display:inline-block;
+  padding-left:100%;
+  white-space:nowrap;
+  animation:scrollText 20s linear infinite;
+}
+
+@keyframes scrollText{
+  from{ transform:translateX(0); }
+  to{ transform:translateX(-100%); }
+}
 </style>
 </head>
 <body>
 
 <video id="video" autoplay playsinline></video>
-  <div id="marqueeText">
-  <span>WELCOME SA SAN MATEO CABLE • ENJOY WATCHING • SUBSCRIBE FOR MORE MOVIES 🎬</span>
+<div id="marqueeText">
+  <span id="marqueeContent"></span>
 </div>
 <div id="playlistPanel"></div>
 <div id="titleOverlay"></div>
@@ -174,6 +204,8 @@ document.addEventListener("DOMContentLoaded", () => {
    const secondText2 = document.getElementById("secondText2");
   const logo1 = document.getElementById("logo1");
   const logo2 = document.getElementById("logo2");
+  const marqueeText = document.getElementById("marqueeText");
+const marqueeContent = document.getElementById("marqueeContent");
  let resumeKey = "video-resume-time";
   const playlistPanel = document.getElementById("playlistPanel");
 
@@ -211,7 +243,8 @@ function buildPlaylistUI(){
       manifest: "https://ia801708.us.archive.org/10/items/extraction-2-2023-tagalog-1080p-hd-1-001_202601/Daredevil%20%282003%29.mp4",
      title: "Daredevil",
     secondText: "Parental Guidance",
-    logo1: "https://i.imgur.com/tRyRFmM.png"
+    logo1: "https://i.imgur.com/tRyRFmM.png",
+    marquee: "WELCOME SA SAN MATEO CABLE • ENJOY WATCHING CARS MOVIE 🚗"
     },
  {
       type: "MP4",
@@ -425,6 +458,9 @@ function buildPlaylistUI(){
 
     logo2.src = item.logo2 || "";
     logo2.style.display = item.logo2 ? "block" : "none";
+
+    marqueeContent.textContent = item.marquee || "";
+marqueeText.style.display = item.marquee ? "block" : "none";
   }
 
  async function playMP4(url, item){
@@ -675,6 +711,7 @@ src="https://cdn.jsdelivr.net/npm/disable-devtool"></script>
 
 </body>
 </html>
+
 
 
 
