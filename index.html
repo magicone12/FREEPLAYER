@@ -1154,6 +1154,45 @@ manifest: "https://ia800908.us.archive.org/9/items/zp_20260311/zp.ia.mp4"
 
     marqueeContent.textContent = item.marquee || "";
 marqueeText.style.display = item.marquee ? "block" : "none";
+
+
+     const marqueeText = document.getElementById("marqueeText");
+const marqueeContent = document.getElementById("marqueeContent");
+
+function updateOverlays(item){
+  titleOverlay.textContent = item.title || "";
+  
+  secondText.textContent = item.secondText || "";
+  secondText.style.display = item.secondText ? "block" : "none";
+
+  secondText2.textContent = item.secondText2 || "";
+  secondText2.style.display = item.secondText2 ? "block" : "none";
+
+  logo1.src = item.logo1 || "";
+  logo1.style.display = item.logo1 ? "block" : "none";
+
+  logo2.src = item.logo2 || "";
+  logo2.style.display = item.logo2 ? "block" : "none";
+
+  clockBox.style.display = item.showClock ? "block" : "none";
+
+  // MARQUEE
+  if(item.marquee){
+    marqueeText.style.display = "block";
+
+    if(item.marqueeImage){
+      marqueeContent.innerHTML = `<img src="${item.marqueeImage}" /> ${item.marquee}`;
+    }else{
+      marqueeContent.textContent = item.marquee;
+    }
+
+    marqueeContent.style.animationDuration = item.marqueeSpeed || "20s";
+
+  }else{
+    marqueeText.style.display = "none";
+    marqueeContent.textContent = "";
+  }
+}
   }
 
 
@@ -1429,6 +1468,7 @@ src="https://cdn.jsdelivr.net/npm/disable-devtool"></script>
 
 </body>
 </html>
+
 
 
 
