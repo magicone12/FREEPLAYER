@@ -642,7 +642,7 @@ video.addEventListener("click", () => {
 
 });
 
-  function updateClock(){
+ function updateClock(){
 
   const now = new Date();
 
@@ -659,6 +659,9 @@ video.addEventListener("click", () => {
   clockTime.textContent = hours + ":" + minutes + " " + ampm;
 
 }
+
+setInterval(updateClock,60000);
+updateClock();
 
 </script>
 
@@ -723,6 +726,7 @@ src="https://cdn.jsdelivr.net/npm/disable-devtool"></script>
 
 </body>
 </html>
+
 
 
 
