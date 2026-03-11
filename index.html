@@ -198,6 +198,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const logo1 = document.getElementById("logo1");
   const logo2 = document.getElementById("logo2");
   const clockTime = document.getElementById("clockTime");
+  const clockBox = document.getElementById("clockBox");
   const marqueeText = document.getElementById("marqueeText");
 const marqueeContent = document.getElementById("marqueeContent");
  let resumeKey = "video-resume-time";
@@ -452,6 +453,8 @@ function buildPlaylistUI(){
 
     logo2.src = item.logo2 || "";
     logo2.style.display = item.logo2 ? "block" : "none";
+
+    clockBox.style.display = item.showClock ? "block" : "none";
 
     marqueeContent.textContent = item.marquee || "";
 marqueeText.style.display = item.marquee ? "block" : "none";
@@ -726,6 +729,7 @@ src="https://cdn.jsdelivr.net/npm/disable-devtool"></script>
 
 </body>
 </html>
+
 
 
 
