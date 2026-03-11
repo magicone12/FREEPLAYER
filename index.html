@@ -172,44 +172,15 @@ video{
   z-index:15;
 }
 
-  #marqueeText{
-  position:absolute;
-  bottom:0;          /* pwesto sa ibaba */
-  width:100%;
-  overflow:hidden;
-  background:rgba(0,0,0,0.7); /* kulay ng background */
-  color:white;
-  font-family:Arial;
-  font-size:18px;
-  padding:6px 0;
-  z-index:15;
-  display:none;       /* lalabas lang kung may text */
-}
-
-#marqueeContent{
-  display:inline-block;
-  padding-left:100%;
-  white-space:nowrap;
-  animation:scrollText 20s linear infinite;
-  vertical-align: middle;
-}
-
-#marqueeContent img{
-  height:24px;          /* adjust size ng image */
-  vertical-align: middle;
-  margin-right:8px;     /* space sa text */
-}
-
-@keyframes scrollText{
-  0%   { transform: translateX(0); }
-  100% { transform: translateX(-100%); }
-}
+ 
 </style>
 </head>
 <body>
 
 <video id="video" autoplay playsinline></video>
-
+  <div id="marqueeText">
+  <span id="marqueeContent"></span>
+</div>
 <div id="playlistPanel"></div>
 <div id="titleOverlay"></div>
 <div id="secondText"></div>
@@ -220,9 +191,7 @@ video{
 <img id="logo1" >
 <img id="logo2" >
 
-  <div id="marqueeText">
-  <span id="marqueeContent"></span>
-</div>
+
 
   <script>
 document.addEventListener("DOMContentLoaded", () => {
@@ -1470,6 +1439,7 @@ src="https://cdn.jsdelivr.net/npm/disable-devtool"></script>
 
 </body>
 </html>
+
 
 
 
