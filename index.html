@@ -535,40 +535,75 @@ async function playMP4(url, item){
 
   video.load();
 
-  // Retry mechanism kung may error sa video
   let retryTimeout;
+
   function retryPlay(){
     retryTimeout = setTimeout(async () => {
-      try {
+      try{
         await video.play();
+
+        const savedTime = localStorage.getItem(resumeKey);
+        if(savedTime){
+          video.currentTime = savedTime;
+        }
+
+      }catch(e){
+        retryPlay();
+      }
+    },3000);
+  }
+
+  video.onerror = () => {
+    console.log("Video error, retrying...");
+    retryPlay();
+  };
+
+  try{
+    await video.play();
+
+    const savedTime = localStorage.getItem(resumeKey);
+    if(savedTime){
+      video.currentTime = savedTime;
+    }
+
+  }catch(e){
+    retryPlay();
+  }
+
+}
+
+
 async function playMPD(url, keyString, item){
 
   let resumeKey = "video-resume-" + currentIndex;
 
   updateOverlays(item);
-        const savedTime = localStorage.getItem(resumeKey);
-if(savedTime){
-  video.currentTime = savedTime;
-}
-      } catch(e){
-        retryPlay();
-      }
-    }, 3000);
+  await destroyPlayers();
+  shakaPlayer = new shaka.Player(video);
+
+  if(keyString){
+    const [k1, k2] = keyString.split(":");
+    shakaPlayer.configure({ drm:{ clearKeys:{[k1.trim()]: k2.trim()} } });
   }
 
-  video.onerror = () => {
-    console.log("Video error, retrying in 3s...");
-    retryPlay();
-  };
+  try{
 
-  try { await video.play();  const savedTime = localStorage.getItem(resumeKey);
-if(savedTime){
-  video.currentTime = savedTime;
-}
-   } 
-  catch(e){ retryPlay(); }
+    await shakaPlayer.load(url);
+    await video.play();
+
+    const savedTime = localStorage.getItem(resumeKey);
+    if(savedTime){
+      video.currentTime = savedTime;
+    }
+
+  }catch(e){
+    console.log("Autoplay failed", e);
+  }
+
 }
 
+
+  
 async function playMPD(url, keyString, item){
   updateOverlays(item);
   await destroyPlayers();
