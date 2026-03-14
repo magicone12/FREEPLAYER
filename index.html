@@ -206,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const clockBox = document.getElementById("clockBox");
   const marqueeText = document.getElementById("marqueeText");
 const marqueeContent = document.getElementById("marqueeContent");
- let resumeKey = "video-resume-time";
+let resumeKey = "video-resume-" + currentIndex;
   const playlistPanel = document.getElementById("playlistPanel");
 
 function buildPlaylistUI(){
