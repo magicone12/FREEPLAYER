@@ -531,8 +531,8 @@ async function playMP4(url, item){
 
   updateOverlays(item);
   await destroyPlayers();
-  video.src = url;
 
+  video.src = url;
   video.load();
 
   let retryTimeout;
@@ -572,18 +572,20 @@ async function playMP4(url, item){
 
 }
 
-
 async function playMPD(url, keyString, item){
 
   let resumeKey = "video-resume-" + currentIndex;
 
   updateOverlays(item);
   await destroyPlayers();
+
   shakaPlayer = new shaka.Player(video);
 
   if(keyString){
-    const [k1, k2] = keyString.split(":");
-    shakaPlayer.configure({ drm:{ clearKeys:{[k1.trim()]: k2.trim()} } });
+    const [k1,k2] = keyString.split(":");
+    shakaPlayer.configure({
+      drm:{clearKeys:{[k1.trim()]:k2.trim()}}
+    });
   }
 
   try{
@@ -597,73 +599,14 @@ async function playMPD(url, keyString, item){
     }
 
   }catch(e){
-    console.log("Autoplay failed", e);
+    console.log("Shaka load error",e);
   }
 
 }
 
 
   
-async function playMPD(url, keyString, item){
-  updateOverlays(item);
-  await destroyPlayers();
-  shakaPlayer = new shaka.Player(video);
 
-  if(keyString){
-    const [k1, k2] = keyString.split(":");
-    shakaPlayer.configure({ drm:{ clearKeys:{[k1.trim()]: k2.trim()} } });
-  }
-
-  // Retry on Shaka network error
-  shakaPlayer.addEventListener('error', (event) => {
-    const shakaError = event.detail;
-    console.warn("Shaka Player error, retrying in 3s...", shakaError);
-    setTimeout(async () => {
-    try { 
-  await shakaPlayer.load(url); 
-  await video.play();
-
-  const savedTime = localStorage.getItem(resumeKey);
-  if(savedTime){
-    video.currentTime = savedTime;
-  }
-
-} catch(e){ 
-  console.log("Autoplay failed, will retry.", e); 
-}
-    }, 3000);
-  });
-
- try { 
-  await shakaPlayer.load(url); 
-  await video.play();
-
-  const savedTime = localStorage.getItem(resumeKey);
-  if(savedTime){
-    video.currentTime = savedTime;
-  }
-
-} catch(e){ 
-  console.log("Autoplay failed, will retry.", e); 
-}
-
-}
-async function playNext(){
-  const item = playlist[currentIndex];
-
-  if(item.type === "MP4"){
-    await playMP4(item.manifest, item);
-  } else if(item.type === "IPTV"){
-    await playMPD(item.manifest, item.key, item);
-  }
-
-  video.onended = () => {
-    currentIndex = (currentIndex + 1) % playlist.length;
-    playNext();
-  };
-}
- 
-  
   
   // AUTO RESUME kapag nawalan ng internet
 window.addEventListener("online", () => {
