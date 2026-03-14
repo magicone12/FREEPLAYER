@@ -4,7 +4,6 @@
 <meta charset="UTF-8">
 <title>IPTV Player</title>
 
-
 <style>
 html, body{
   margin:0;
@@ -17,80 +16,63 @@ html, body{
 video{
   width:100%;
   height:100%;
-  object-fit: fill; /* stretch video to fill screen */
+  object-fit: fill;
   background:black;
 }
 
 /* TITLE OVERLAY */
 #titleOverlay{
   position:absolute;
-  top:30px;   /* adjust vertical position */
-  left:50px;  /* adjust horizontal position */
-  
+  top:30px;
+  left:50px;
   color:#fff;
   font-family: Arial, sans-serif;
-  font-size:14px;  /* adjust font size */
-  padding: 10px 16px;  /* adjust padding around text */
+  font-size:14px;
+  padding: 10px 16px;
   border-radius: 8px;
   z-index: 10;
 }
 
-  #secondText{
+#secondText{
   position:absolute;
-
-  bottom:50px;   /* adjust mo pwesto (ibaba) */
-  right:50px;     /* adjust mo pwesto (kaliwa) */
-
-
-  color:#fff;
-
-  font-family: Arial, sans-serif;
-  font-size: 20px;   /* 👉 LAKI / LIIT ng text */
-  padding: 8px 14px;
-  border-radius: 6px;
-
-  z-index:10;
-}
-
-    #secondText2{
-  position:absolute;
-
-  bottom:50px;   /* adjust mo pwesto (ibaba) */
-  left:50px;     /* adjust mo pwesto (kaliwa) */
-
-
-  color:#fff;
-
-  font-family: Arial, sans-serif;
-  font-size: 13px;   /* 👉 LAKI / LIIT ng text */
-  padding: 8px 14px;
-  border-radius: 6px;
-
-  z-index:10;
-}
-
-  #logo1{
-  position:absolute;
-
-  top:15px;      /* pwesto */
+  bottom:50px;
   right:50px;
+  color:#fff;
+  font-family: Arial, sans-serif;
+  font-size: 20px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  z-index:10;
+}
 
-  width:110px;    /* laki ng logo */
+#secondText2{
+  position:absolute;
+  bottom:50px;
+  left:50px;
+  color:#fff;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  padding: 8px 14px;
+  border-radius: 6px;
+  z-index:10;
+}
+
+#logo1{
+  position:absolute;
+  top:15px;
+  right:50px;
+  width:110px;
   height:90px;
-
   z-index:10;
   pointer-events:none;
 }
 
 #logo2{
   position:absolute;
-
-  top:20px;      /* pwesto */
+  top:20px;
   left:20px;
-
-  width:80px;    /* laki ng logo */
+  width:80px;
   height:auto;
-
   z-index:10;
   pointer-events:none;
 }
@@ -105,7 +87,7 @@ video{
   overflow-y:auto;
   z-index:20;
   padding-top:20px;
-  display:none; /* hidden by default */
+  display:none;
 }
 
 .playItem{
@@ -121,24 +103,19 @@ video{
   background:rgba(255,255,255,0.1);
 }
 
-
-
-  #marqueeText{
+#marqueeText{
   position:absolute;
   bottom:0;
   left:0;
   width:100%;
   overflow:hidden;
-
- background:blue; /* background color */
+  background:blue;
   color:#fff;
-
   font-family:Arial;
   font-size:18px;
   padding:8px 0;
-
   z-index:15;
-  display:none; /* default naka hide */
+  display:none;
 }
 
 #marqueeContent{
@@ -153,84 +130,53 @@ video{
   to{ transform:translateX(-100%); }
 }
 
-  #clockBox{
+#clockBox{
   position:absolute;
-
   bottom:0px;
   left:6px;
-
   background:black;
   color:white;
-
   font-family:Arial;
   font-size:18px;
-
   padding:10px 12px;
   border-radius:4px;
-
   z-index:15;
 }
-
- 
 </style>
 </head>
 <body>
 
 <video id="video" autoplay playsinline></video>
-  <div id="marqueeText">
+<div id="marqueeText">
   <span id="marqueeContent"></span>
 </div>
 <div id="playlistPanel"></div>
 <div id="titleOverlay"></div>
 <div id="secondText"></div>
-  <div id="secondText2"></div>
-  <div id="clockBox">
-  <span id="clockTime"></span>
-</div>
+<div id="secondText2"></div>
+<div id="clockBox"><span id="clockTime"></span></div>
 <img id="logo1" >
 <img id="logo2" >
 
-
-
-  <script>
+<script>
 document.addEventListener("DOMContentLoaded", () => {
 
   const video = document.getElementById("video");
   const titleOverlay = document.getElementById("titleOverlay");
   const secondText = document.getElementById("secondText");
-   const secondText2 = document.getElementById("secondText2");
+  const secondText2 = document.getElementById("secondText2");
   const logo1 = document.getElementById("logo1");
   const logo2 = document.getElementById("logo2");
   const clockTime = document.getElementById("clockTime");
   const clockBox = document.getElementById("clockBox");
   const marqueeText = document.getElementById("marqueeText");
-const marqueeContent = document.getElementById("marqueeContent");
-
+  const marqueeContent = document.getElementById("marqueeContent");
   const playlistPanel = document.getElementById("playlistPanel");
 
-function buildPlaylistUI(){
-  playlistPanel.innerHTML = "";
+  let currentIndex = 0;
 
-  playlist.forEach((item,index)=>{
-    const div = document.createElement("div");
-    div.className = "playItem";
-    div.textContent = item.title;
-
-  div.onclick = async () => {
-  currentIndex = index;
-  await playMP4(item.manifest,item);
-
-  // hide playlist after clicking
-  playlistPanel.style.display = "none";
-};
-
-    playlistPanel.appendChild(div);
-  });
-}
- let currentIndex = 0;
-
-const playlist = [
-  {
+  const playlist = [
+   {
       type: "MP4",
       manifest: "https://ia801503.us.archive.org/1/items/and-the-breadwinner-is...-1080-p_20260311/And_the_Breadwinner_Is..._1080P.mp4",
      title: "And the Breadwinner Is...",
@@ -473,340 +419,126 @@ manifest: "https://ia800908.us.archive.org/9/items/zp_20260311/zp.ia.mp4"
 }
     
 
-];
+  ];
 
-// UPDATE OVERLAYS
-function updateOverlays(item){
-  titleOverlay.textContent = item.title || "";
-  secondText.textContent = item.secondText || "";
-  secondText.style.display = item.secondText ? "block" : "none";
-
-  secondText2.textContent = item.secondText2 || "";
-  secondText2.style.display = item.secondText2 ? "block" : "none";
-
-  logo1.src = item.logo1 || "";
-  logo1.style.display = item.logo1 ? "block" : "none";
-
-  logo2.src = item.logo2 || "";
-  logo2.style.display = item.logo2 ? "block" : "none";
-
-  clockBox.style.display = item.showClock ? "block" : "none";
-
-  marqueeContent.textContent = item.marquee || "";
-  marqueeText.style.display = item.marquee ? "block" : "none";
-}
-
-// PLAY MP4
-async function playMP4(url, item){
-  updateOverlays(item);
-
-  video.src = url;
-  video.load();
-
-  let resumeKey = "video-resume-" + currentIndex;
-
-  function retryPlay(){
-    setTimeout(async () => {
-      try{
-        await video.play();
-        const savedTime = localStorage.getItem(resumeKey);
-        if(savedTime) video.currentTime = savedTime;
-      }catch(e){
-        retryPlay();
-      }
-    }, 3000);
+  function updateOverlays(item){
+    titleOverlay.textContent = item.title || "";
+    secondText.textContent = item.secondText || "";
+    secondText.style.display = item.secondText ? "block" : "none";
+    secondText2.textContent = item.secondText2 || "";
+    secondText2.style.display = item.secondText2 ? "block" : "none";
+    logo1.src = item.logo1 || "";
+    logo1.style.display = item.logo1 ? "block" : "none";
+    logo2.src = item.logo2 || "";
+    logo2.style.display = item.logo2 ? "block" : "none";
+    clockBox.style.display = item.showClock ? "block" : "none";
+    marqueeContent.textContent = item.marquee || "";
+    marqueeText.style.display = item.marquee ? "block" : "none";
   }
 
-  video.onerror = retryPlay;
-
-  try{
-    await video.play();
+  async function playMP4(url, item){
+    updateOverlays(item);
+    video.src = url;
+    video.load();
+    let resumeKey = "video-resume-" + currentIndex;
     const savedTime = localStorage.getItem(resumeKey);
     if(savedTime) video.currentTime = savedTime;
-  }catch(e){
-    retryPlay();
-  }
-}
 
-// PLAY NEXT
-async function playNext(){
-  const item = playlist[currentIndex];
-  await playMP4(item.manifest, item);
-
-  video.onended = () => {
-    currentIndex = (currentIndex + 1) % playlist.length;
-    playNext();
-  };
-}
-
-// AUTO SAVE TIME
-video.addEventListener("timeupdate", () => {
-  localStorage.setItem("video-resume-" + currentIndex, video.currentTime);
-});
-
-// RETRY ON BUFFERING
-video.addEventListener("stalled", () => setTimeout(()=> video.play().catch(()=>{}), 3000));
-video.addEventListener("waiting", () => setTimeout(()=> video.play().catch(()=>{}), 3000));
-
-// START PLAYLIST
-playNext();
-buildPlaylistUI();
-  
-  // AUTO RESUME kapag nawalan ng internet
-window.addEventListener("online", () => {
-  console.log("Internet restored, resuming playback...");
-  playNext();
-});
-
-// Kapag nag buffering o huminto ang video
-video.addEventListener("stalled", () => {
-  console.log("Video stalled, retrying...");
-  setTimeout(() => {
-    video.play().catch(()=>{});
-  }, 3000);
-});
-  
-video.addEventListener("timeupdate", () => {
-  let resumeKey = "video-resume-" + currentIndex;
-  localStorage.setItem(resumeKey, video.currentTime);
-});
-  
-video.addEventListener("waiting", () => {
-  console.log("Buffering detected, retrying...");
-  setTimeout(() => {
-    video.play().catch(()=>{});
-  }, 3000);
-});
-  
-  
-  // INTERNET WATCHDOG
-let internetTimer = null;
-
-// kapag nawalan internet
-window.addEventListener("offline", () => {
-  console.log("Internet lost");
-
-  internetTimer = setTimeout(() => {
-    console.log("No internet for 30s, refreshing page...");
-    location.reload();
-  }, 30000); // 30 seconds
-});
-
-// kapag bumalik internet
-window.addEventListener("online", () => {
-  console.log("Internet restored");
-
-  if(internetTimer){
-    clearTimeout(internetTimer);
-    internetTimer = null;
+    try { await video.play(); } catch(e){
+      setTimeout(()=> video.play().catch(()=>{}), 3000);
+    }
   }
 
-  playNext(); // resume playlist
-});
+  function buildPlaylistUI(){
+    playlistPanel.innerHTML = "";
+    playlist.forEach((item,index)=>{
+      const div = document.createElement("div");
+      div.className = "playItem";
+      div.textContent = item.title || "Video " + (index+1);
+      div.onclick = async () => {
+        currentIndex = index;
+        await playMP4(item.manifest,item);
+        playlistPanel.style.display = "none";
+      };
+      playlistPanel.appendChild(div);
+    });
+  }
 
+  async function playNext(){
+    const item = playlist[currentIndex];
+    await playMP4(item.manifest,item);
 
+    video.onended = () => {
+      currentIndex = (currentIndex + 1) % playlist.length;
+      playNext();
+    };
+  }
 
+  video.addEventListener("timeupdate", () => {
+    localStorage.setItem("video-resume-" + currentIndex, video.currentTime);
+  });
 
-  // Start playlist autoplay
-  playNext();
-buildPlaylistUI();
+  video.addEventListener("stalled", () => setTimeout(()=> video.play().catch(()=>{}), 3000));
+  video.addEventListener("waiting", () => setTimeout(()=> video.play().catch(()=>{}), 3000));
+
   let playlistVisible = true;
+  video.addEventListener("click", () => {
+    playlistPanel.style.display = playlistVisible ? "none" : "block";
+    playlistVisible = !playlistVisible;
+  });
 
-video.addEventListener("click", () => {
-
-  if(playlistVisible){
-    playlistPanel.style.display = "none";
-    playlistVisible = false;
-  }else{
-    playlistPanel.style.display = "block";
-    playlistVisible = true;
-  }
-
-});
-  // Optional: Fullscreen automatically
   video.requestFullscreen?.();
+  buildPlaylistUI();
+  playNext();
 
+  let internetTimer = null;
+  window.addEventListener("offline", () => { internetTimer = setTimeout(()=> location.reload(), 30000); });
+  window.addEventListener("online", () => { if(internetTimer){ clearTimeout(internetTimer); internetTimer=null; } playNext(); });
+
+  function updateClock(){
+    const now = new Date();
+    let hours = now.getHours();
+    let minutes = String(now.getMinutes()).padStart(2,"0");
+    let ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
+    clockTime.textContent = hours + ":" + minutes + " " + ampm;
+  }
+  setInterval(updateClock,60000);
+  updateClock();
 });
 
- function updateClock(){
-
-  const now = new Date();
-
-  let hours = now.getHours();
-  let minutes = now.getMinutes();
-
-  let ampm = hours >= 12 ? "PM" : "AM";
-
-  hours = hours % 12;
-  hours = hours ? hours : 12;
-
-  minutes = String(minutes).padStart(2,"0");
-
-  clockTime.textContent = hours + ":" + minutes + " " + ampm;
-
-}
-
-setInterval(updateClock,60000);
-updateClock();
-
-</script>
-
-
-
-     <script>
 /* ============================
-   SIMPLE PAGE PROTECTION ONLY
-   (NO CHANGE TO YOUR PLAYER)
+   PAGE PROTECTION START
    ============================ */
+var ALLOWED_HOST = "onesanmateocable.pages.dev";
 
-/* PALITAN MO ITO NG DOMAIN MO */
-var ALLOWED_HOST = "onesanmateocable.pages.dev/";
-
-/* fake 404 kapag ibang website binuksan */
-if (location.hostname !== ALLOWED_HOST) {
+if(location.hostname !== ALLOWED_HOST){
   document.open();
   document.write(`
 <html>
-      <head><title>SAN MATEO CABLE AFFLIATE</title></head>
-      <body style="margin:0;background:#000;color:#fff;
-      display:absulute;align-items:center;justify-content:center;
-      height:100vh;font-family:Arial;text-align: center;  overflow:hidden;">
-     <center>   <P><h1>ENJOY WATCHING</h1></P>
-        <p>PUMILI LAMANG SA DALAWA LIST AFFLIATE TV OR SAN MATEO CABLE</p>
-        <p>PARA LUMABAS ANG MGA CHANNELS</p><br><br><br></center>
-        <img src="https://i.imgur.com/urWAPgv.png"  width="80" height="60">
-        <p><center><h4>     &copy;2025-26 GOLDEN TELEVISION NETWORK | <a href="#">All Rights Reserved</a></h4></center></p>
-      </body>
-    </html>
-
+<head><title>SAN MATEO CABLE AFFILIATE</title></head>
+<body style="margin:0;background:#000;color:#fff;display:flex;align-items:center;justify-content:center;height:100vh;font-family:Arial;text-align:center;overflow:hidden;">
+  <div>
+    <h1>ENJOY WATCHING</h1>
+    <p>PUMILI LAMANG SA DALAWA: LIST AFFILIATE TV O SAN MATEO CABLE</p>
+    <p>PARA LUMABAS ANG MGA CHANNELS</p><br>
+    <img src="https://i.imgur.com/urWAPgv.png" width="80" height="60">
+    <p>&copy;2025-26 GOLDEN TELEVISION NETWORK | <a href="#">All Rights Reserved</a></p>
+  </div>
+</body>
+</html>
   `);
   document.close();
 }
 
-/* disable right click */
-document.addEventListener("contextmenu", function(e){
-  e.preventDefault();
-});
-
-/* block CTRL+U and CTRL+SHIFT+C */
-document.addEventListener("keydown", function(e){
-
-  /* CTRL + U */
-  if (e.ctrlKey && e.key.toLowerCase() === "u") {
-    e.preventDefault();
-    return false;
-  }
-
-  /* CTRL + SHIFT + C */
-  if (e.ctrlKey && e.shiftKey && e.key.toLowerCase() === "c") {
-    e.preventDefault();
-    return false;
-  }
-
+/* I-disable ang right-click at shortcut keys */
+document.addEventListener("contextmenu", e => e.preventDefault());
+document.addEventListener("keydown", e => {
+  if(e.ctrlKey && e.key.toLowerCase()==="u") e.preventDefault();
+  if(e.ctrlKey && e.shiftKey && e.key.toLowerCase()==="c") e.preventDefault();
 });
 </script>
 
-
-<script disable-devtool-auto
-src="https://cdn.jsdelivr.net/npm/disable-devtool"></script>
-
+<script disable-devtool-auto src="https://cdn.jsdelivr.net/npm/disable-devtool"></script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
