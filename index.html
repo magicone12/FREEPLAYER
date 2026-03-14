@@ -675,20 +675,7 @@ window.addEventListener("online", () => {
   playNext(); // resume playlist
 });
 
-// retry kapag buffering
-video.addEventListener("stalled", () => {
-  console.log("Video stalled, retrying...");
-  setTimeout(() => {
-    video.play().catch(()=>{});
-  }, 3000);
-});
 
-video.addEventListener("waiting", () => {
-  console.log("Buffering detected, retrying...");
-  setTimeout(() => {
-    video.play().catch(()=>{});
-  }, 3000);
-});
 
 
   // Start playlist autoplay
