@@ -206,7 +206,7 @@ document.addEventListener("DOMContentLoaded", () => {
   const clockBox = document.getElementById("clockBox");
   const marqueeText = document.getElementById("marqueeText");
 const marqueeContent = document.getElementById("marqueeContent");
-let resumeKey = "video-resume-" + currentIndex;
+
   const playlistPanel = document.getElementById("playlistPanel");
 
 function buildPlaylistUI(){
@@ -525,11 +525,13 @@ marqueeText.style.display = item.marquee ? "block" : "none";
  
 
   
- async function playMP4(url, item){
+async function playMP4(url, item){
+
+  let resumeKey = "video-resume-" + currentIndex;
+
   updateOverlays(item);
   await destroyPlayers();
   video.src = url;
-
 
   video.load();
 
@@ -539,7 +541,11 @@ marqueeText.style.display = item.marquee ? "block" : "none";
     retryTimeout = setTimeout(async () => {
       try {
         await video.play();
+async function playMPD(url, keyString, item){
 
+  let resumeKey = "video-resume-" + currentIndex;
+
+  updateOverlays(item);
         const savedTime = localStorage.getItem(resumeKey);
 if(savedTime){
   video.currentTime = savedTime;
@@ -639,6 +645,7 @@ video.addEventListener("stalled", () => {
 });
   
 video.addEventListener("timeupdate", () => {
+  let resumeKey = "video-resume-" + currentIndex;
   localStorage.setItem(resumeKey, video.currentTime);
 });
   
