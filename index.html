@@ -216,19 +216,12 @@ function buildPlaylistUI(){
     div.className = "playItem";
     div.textContent = item.title;
 
-   div.onclick = async () => {
-
+  div.onclick = async () => {
   currentIndex = index;
-
-  if(item.type === "MP4"){
-    await playMP4(item.manifest,item);
-  }else if(item.type === "IPTV"){
-    await playMPD(item.manifest,item.key,item);
-  }
+  await playMP4(item.manifest,item);
 
   // hide playlist after clicking
   playlistPanel.style.display = "none";
-
 };
 
     playlistPanel.appendChild(div);
