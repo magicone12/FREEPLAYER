@@ -604,9 +604,24 @@ async function playMPD(url, keyString, item){
 
 }
 
+/* ILAGAY MO DITO */
+async function playNext(){
 
-  
+  const item = playlist[currentIndex];
 
+  if(item.type === "MP4"){
+    await playMP4(item.manifest, item);
+  }
+  else if(item.type === "IPTV"){
+    await playMPD(item.manifest, item.key, item);
+  }
+
+  video.onended = () => {
+    currentIndex = (currentIndex + 1) % playlist.length;
+    playNext();
+  };
+
+}
   
   // AUTO RESUME kapag nawalan ng internet
 window.addEventListener("online", () => {
