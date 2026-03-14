@@ -25,6 +25,7 @@ video{
   top:30px;
   left:95px;
   color:#fff;
+   background:yellow;
   font-family: Arial, sans-serif;
   font-size:12px;
   padding: 8px 14px;
@@ -434,6 +435,7 @@ manifest: "https://ia800908.us.archive.org/9/items/zp_20260311/zp.ia.mp4"
 
   function updateOverlays(item){
     titleOverlay.textContent = item.title || "";
+    titleOverlay.style.display = item.title ? "block" : "none";
     secondText.textContent = item.secondText || "";
     secondText.style.display = item.secondText ? "block" : "none";
     secondText2.textContent = item.secondText2 || "";
